@@ -3,10 +3,9 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-// Images are served from the public/ directory; reference them via absolute URLs
-const reveal = '/images/reveal.png';
-const mirai = '/images/mirai.png';
-const shapeTwo = '/images/shape-two.png';
+import reveal from './reveal.png';
+import mirai from './mirai.png';
+import shapeTwo from './shape-two.png';
 import type { StaticImageData } from 'next/image';
 
 if (typeof window !== "undefined") {
@@ -32,7 +31,7 @@ function Hotspot({ title, subtitle, description, position }: HotspotProps) {
     >
       {/* Circle with plus icon */}
       <div 
-        className="relative z-20 flex items-center justify-center w-14 h-14 rounded-full cursor-pointer transition-all duration-500 ease-out flex-shrink-0"
+        className="relative z-20 flex items-center justify-center w-14 h-14 rounded-full cursor-pointer transition-all duration-500 ease-out shrink-0"
         style={{
           backgroundColor: isHovered ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
           border: '1.5px solid rgba(255, 255, 255, 0.5)',

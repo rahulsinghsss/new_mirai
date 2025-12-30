@@ -39,6 +39,17 @@ const Nav = () => {
       document.body.classList.remove('overflow-hidden')
       document.documentElement.classList.remove('overflow-hidden')
     }
+
+    // Cleanup on unmount to avoid leaving the document locked if the component
+    // unmounts while the menu is open for any reason (route change, HMR, etc.)
+    return () => {
+      try {
+        document.body.classList.remove('overflow-hidden')
+        document.documentElement.classList.remove('overflow-hidden')
+      } catch (e) {
+        // noop in non-browser environments
+      }
+    }
   }, [isOpen])
 
   const carouselImages = [

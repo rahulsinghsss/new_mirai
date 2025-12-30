@@ -20,8 +20,22 @@ const MobileNav = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (isOpen) document.body.classList.add('overflow-hidden')
-    else document.body.classList.remove('overflow-hidden')
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden')
+      document.documentElement.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+      document.documentElement.classList.remove('overflow-hidden')
+    }
+
+    return () => {
+      try {
+        document.body.classList.remove('overflow-hidden')
+        document.documentElement.classList.remove('overflow-hidden')
+      } catch (e) {
+        // noop
+      }
+    }
   }, [isOpen])
 
   useEffect(() => {
