@@ -169,7 +169,7 @@ export function RevealZoom({
   buildingImage = reveal,
   windowImage = mirai,
   shapeImage = shapeTwo,
-  scrollDistance = "+=1000%",  // Balanced scroll distance
+  scrollDistance = "+=1000%",
   buildingZoomScale = 16,
   windowZoomScale = 2.5,
   windowMoveDistance = 1,
@@ -188,8 +188,10 @@ export function RevealZoom({
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const needsDrawRef = useRef(false);
+  const isInitializedRef = useRef(false);
   
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   
   const animState = useRef({
@@ -202,6 +204,45 @@ export function RevealZoom({
   const resolvedBuildingSrc = typeof buildingImage === 'string' ? buildingImage : buildingImage.src;
   const resolvedWindowSrc = typeof windowImage === 'string' ? windowImage : windowImage.src;
   const resolvedShapeSrc = typeof shapeImage === 'string' ? shapeImage : shapeImage.src;
+
+  // ============================================
+  // FIX: Prevent auto-play on page refresh
+  // This must be the FIRST useEffect to run
+  // ============================================
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Prevent browser from restoring scroll position on refresh
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    // Kill any existing ScrollTriggers that might have cached positions
+    ScrollTrigger.getAll().forEach(st => st.kill());
+    ScrollTrigger.clearMatchMedia();
+
+    // Force scroll to top immediately
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Reset animation state
+    animState.current = {
+      scale: 1,
+      panY: 0,
+      lastScale: -1,
+      lastPanY: -1,
+    };
+
+    // Small delay to ensure everything is reset before allowing initialization
+    const readyTimeout = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+
+    return () => {
+      clearTimeout(readyTimeout);
+    };
+  }, []);
 
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -314,117 +355,148 @@ export function RevealZoom({
     };
   }, [setupCanvas]);
 
+  // ============================================
+  // Main ScrollTrigger Animation Setup
+  // Now waits for isReady to be true
+  // ============================================
   useEffect(() => {
-    if (typeof window === 'undefined' || !imageLoaded) return;
+    if (typeof window === 'undefined' || !imageLoaded || !isReady) return;
+    
+    // Prevent double initialization
+    if (isInitializedRef.current) return;
+    isInitializedRef.current = true;
 
+    // Ensure we're at the top before initializing
+    window.scrollTo(0, 0);
+
+    // Reset animation state to initial values
+    animState.current = {
+      scale: 1,
+      panY: 0,
+      lastScale: -1,
+      lastPanY: -1,
+    };
+
+    // Clear any existing ScrollTriggers
     ScrollTrigger.getAll().forEach(st => st.kill());
     
-    ctxRef.current = gsap.context(() => {
-      gsap.set(textRef.current, { opacity: 0, y: 40 });
-      gsap.set([pointer1Ref.current, pointer2Ref.current, pointer3Ref.current, pointer4Ref.current], { 
-        opacity: 0, 
-        scale: 0,
-        force3D: true
-      });
-      
-      gsap.set(buildingRef.current, { force3D: true });
-      gsap.set(shapeRef.current, { force3D: true });
-      gsap.set(textRef.current, { force3D: true });
-      
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          start: "top top",
-          end: scrollDistance,
-          pin: true,
-          scrub: true,
-          anticipatePin: 1,
-          fastScrollEnd: true,
-          preventOverlaps: true,
-        },
-      });
-
-      // PHASE 1: Building zoom (much slower)
-      tl.to(buildingRef.current, {
-        scale: buildingZoomScale,
-        ease: "none",
-        duration: 8.0,
-      }, 0);
-      
-      tl.to(buildingRef.current, {
-        opacity: 0,
-        ease: "none",
-        duration: 2.5,
-      }, 5.5);
-      
-      // Shape disappears (much slower)
-      tl.to(shapeRef.current, {
-        opacity: 0,
-        ease: "none",
-        duration: 3.0,
-      }, 0);
-
-      // PHASE 2: Text Entry
-      tl.to(textRef.current, {
-        opacity: 1,
-        y: 0,
-        ease: "none", 
-        duration: 0.8,
-      }, 1.5);
-
-      // PHASE 3: Canvas Zoom - comfortable pacing
-      tl.to(animState.current, {
-        scale: windowZoomScale,
-        duration: 2.0,
-        ease: "none", 
-        onUpdate: scheduleCanvasDraw,
-      }, 4.5);
-
-      // PHASE 4: Text Exit
-      tl.to(textRef.current, {
-        opacity: 0,
-        y: -30,
-        ease: "none",
-        duration: 0.5,
-      }, 6.0);
-
-      // PHASE 5: Canvas Pan (slower)
-      tl.to(animState.current, {
-        panY: windowMoveDistance,
-        duration: 4.5, 
-        ease: "none", 
-        onUpdate: scheduleCanvasDraw,
-      }, 6.5);
-
-      // Animate pointers with relaxed timing
-      const animatePointer = (ref: React.RefObject<HTMLDivElement | null>, inT: number, outT: number) => {
-        tl.to(ref.current, { 
-          opacity: 1, 
-          scale: 1, 
-          ease: "none", 
-          duration: 0.6 
-        }, inT);
-        tl.to(ref.current, { 
+    // Small delay to ensure DOM is ready and scroll is at top
+    const initTimeout = setTimeout(() => {
+      ctxRef.current = gsap.context(() => {
+        // Set initial states
+        gsap.set(textRef.current, { opacity: 0, y: 40 });
+        gsap.set([pointer1Ref.current, pointer2Ref.current, pointer3Ref.current, pointer4Ref.current], { 
           opacity: 0, 
-          scale: 0.95, 
+          scale: 0,
+          force3D: true
+        });
+        
+        gsap.set(buildingRef.current, { force3D: true, scale: 1, opacity: 1 });
+        gsap.set(shapeRef.current, { force3D: true, opacity: 1 });
+        gsap.set(textRef.current, { force3D: true });
+        
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrapperRef.current,
+            start: "top top",
+            end: scrollDistance,
+            pin: true,
+            scrub: true,
+            anticipatePin: 1,
+            fastScrollEnd: true,
+            preventOverlaps: true,
+            invalidateOnRefresh: true, // Important: recalculate on refresh
+          },
+        });
+
+        // PHASE 1: Building zoom (much slower)
+        tl.to(buildingRef.current, {
+          scale: buildingZoomScale,
+          ease: "none",
+          duration: 8.0,
+        }, 0);
+        
+        tl.to(buildingRef.current, {
+          opacity: 0,
+          ease: "none",
+          duration: 2.5,
+        }, 5.5);
+        
+        // Shape disappears (much slower)
+        tl.to(shapeRef.current, {
+          opacity: 0,
+          ease: "none",
+          duration: 3.0,
+        }, 0);
+
+        // PHASE 2: Text Entry
+        tl.to(textRef.current, {
+          opacity: 1,
+          y: 0,
           ease: "none", 
-          duration: 0.5 
-        }, outT);
-      };
+          duration: 0.8,
+        }, 1.5);
 
-      animatePointer(pointer1Ref, 6.8, 8.0);
-      animatePointer(pointer2Ref, 8.3, 9.5);
-      animatePointer(pointer3Ref, 9.8, 11.0);
-      animatePointer(pointer4Ref, 11.3, 12.5);
+        // PHASE 3: Canvas Zoom - comfortable pacing
+        tl.to(animState.current, {
+          scale: windowZoomScale,
+          duration: 2.0,
+          ease: "none", 
+          onUpdate: scheduleCanvasDraw,
+        }, 4.5);
 
-    }, wrapperRef);
+        // PHASE 4: Text Exit
+        tl.to(textRef.current, {
+          opacity: 0,
+          y: -30,
+          ease: "none",
+          duration: 0.5,
+        }, 6.0);
+
+        // PHASE 5: Canvas Pan (slower)
+        tl.to(animState.current, {
+          panY: windowMoveDistance,
+          duration: 4.5, 
+          ease: "none", 
+          onUpdate: scheduleCanvasDraw,
+        }, 6.5);
+
+        // Animate pointers with relaxed timing
+        const animatePointer = (ref: React.RefObject<HTMLDivElement | null>, inT: number, outT: number) => {
+          tl.to(ref.current, { 
+            opacity: 1, 
+            scale: 1, 
+            ease: "none", 
+            duration: 0.6 
+          }, inT);
+          tl.to(ref.current, { 
+            opacity: 0, 
+            scale: 0.95, 
+            ease: "none", 
+            duration: 0.5 
+          }, outT);
+        };
+
+        animatePointer(pointer1Ref, 6.8, 8.0);
+        animatePointer(pointer2Ref, 8.3, 9.5);
+        animatePointer(pointer3Ref, 9.8, 11.0);
+        animatePointer(pointer4Ref, 11.3, 12.5);
+
+        // Refresh ScrollTrigger after everything is set up
+        ScrollTrigger.refresh(true);
+
+      }, wrapperRef);
+    }, 50);
 
     return () => {
+      clearTimeout(initTimeout);
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       ctxRef.current?.revert();
+      isInitializedRef.current = false;
     };
-  }, [scrollDistance, buildingZoomScale, windowZoomScale, windowMoveDistance, scheduleCanvasDraw, imageLoaded]);
+  }, [scrollDistance, buildingZoomScale, windowZoomScale, windowMoveDistance, scheduleCanvasDraw, imageLoaded, isReady]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
