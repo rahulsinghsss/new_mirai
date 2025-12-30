@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { StaticImageData } from 'next/image';
 
+// Register GSAP plugin
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+// Use useLayoutEffect on client, useEffect on server
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 // Pointer hotspot component with hover expand effect
 interface HotspotProps {
@@ -186,9 +190,11 @@ export function RevealZoom({
   const rafIdRef = useRef<number | null>(null);
   const needsDrawRef = useRef(false);
   const isInitializedRef = useRef(false);
+  const hasRunInitialResetRef = useRef(false);
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   
   const animState = useRef({
@@ -203,25 +209,41 @@ export function RevealZoom({
   const resolvedShapeSrc = typeof shapeImage === 'string' ? shapeImage : shapeImage.src;
 
   // ============================================
-  // FIX: Prevent auto-play on page refresh
-  // This must be the FIRST useEffect to run
+  // CRITICAL FIX: Aggressive scroll reset
+  // This runs BEFORE paint using useLayoutEffect
   // ============================================
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  useIsomorphicLayoutEffect(() => {
+    if (typeof window === 'undefined' || hasRunInitialResetRef.current) return;
+    hasRunInitialResetRef.current = true;
 
-    // Prevent browser from restoring scroll position on refresh
+    // Immediately disable scroll restoration
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
-    // Kill any existing ScrollTriggers that might have cached positions
+    // Kill ALL existing ScrollTriggers immediately
     ScrollTrigger.getAll().forEach(st => st.kill());
     ScrollTrigger.clearMatchMedia();
+    ScrollTrigger.clearScrollMemory();
 
-    // Force scroll to top immediately
-    window.scrollTo(0, 0);
+    // Force scroll to top using multiple methods
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    
+    // Also try scrolling the wrapper if it exists
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTop = 0;
+    }
+
+    setIsMounted(true);
+  }, []);
+
+  // ============================================
+  // Second layer: useEffect for additional reset
+  // ============================================
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isMounted) return;
 
     // Reset animation state
     animState.current = {
@@ -231,13 +253,57 @@ export function RevealZoom({
       lastPanY: -1,
     };
 
-    // Small delay to ensure everything is reset before allowing initialization
-    const readyTimeout = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
+    // Double-check scroll position after a frame
+    const frameId = requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      
+      // Now we're ready to initialize
+      const readyTimeout = setTimeout(() => {
+        setIsReady(true);
+      }, 150); // Slightly longer delay for Vercel CDN
+
+      return () => clearTimeout(readyTimeout);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [isMounted]);
+
+  // ============================================
+  // Handle browser back/forward navigation
+  // ============================================
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = () => {
+      // Reset on navigation
+      window.scrollTo(0, 0);
+      ScrollTrigger.refresh(true);
+    };
+
+    const handleBeforeUnload = () => {
+      // Reset scroll before page unloads
+      window.scrollTo(0, 0);
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // Handle bfcache (back-forward cache)
+      if (event.persisted) {
+        window.scrollTo(0, 0);
+        ScrollTrigger.getAll().forEach(st => st.kill());
+        isInitializedRef.current = false;
+        setIsReady(false);
+        setTimeout(() => setIsReady(true), 100);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pageshow', handlePageShow);
 
     return () => {
-      clearTimeout(readyTimeout);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pageshow', handlePageShow);
     };
   }, []);
 
@@ -319,7 +385,10 @@ export function RevealZoom({
     drawCanvas();
   }, [drawCanvas]);
 
+  // Load window image
   useEffect(() => {
+    if (!isMounted) return;
+    
     const img = new Image();
     img.decoding = 'async';
     img.onload = () => {
@@ -327,14 +396,16 @@ export function RevealZoom({
       setImageLoaded(true);
     };
     img.src = resolvedWindowSrc;
-  }, [resolvedWindowSrc]);
+  }, [resolvedWindowSrc, isMounted]);
 
+  // Setup canvas when image loads
   useEffect(() => {
-    if (imageLoaded) setupCanvas();
-  }, [imageLoaded, setupCanvas]);
+    if (imageLoaded && isMounted) setupCanvas();
+  }, [imageLoaded, setupCanvas, isMounted]);
 
+  // Handle resize
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !isMounted) return;
     
     let resizeTimeout: NodeJS.Timeout;
     const handleResize = () => {
@@ -350,20 +421,19 @@ export function RevealZoom({
       clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
     };
-  }, [setupCanvas]);
+  }, [setupCanvas, isMounted]);
 
   // ============================================
   // Main ScrollTrigger Animation Setup
-  // Now waits for isReady to be true
   // ============================================
   useEffect(() => {
-    if (typeof window === 'undefined' || !imageLoaded || !isReady) return;
+    if (typeof window === 'undefined' || !imageLoaded || !isReady || !isMounted) return;
     
     // Prevent double initialization
     if (isInitializedRef.current) return;
     isInitializedRef.current = true;
 
-    // Ensure we're at the top before initializing
+    // Final scroll reset before initializing
     window.scrollTo(0, 0);
 
     // Reset animation state to initial values
@@ -377,11 +447,14 @@ export function RevealZoom({
     // Clear any existing ScrollTriggers
     ScrollTrigger.getAll().forEach(st => st.kill());
     
-    // Small delay to ensure DOM is ready and scroll is at top
+    // Delay initialization to ensure everything is settled
     const initTimeout = setTimeout(() => {
+      // One more scroll reset
+      window.scrollTo(0, 0);
+      
       ctxRef.current = gsap.context(() => {
-        // Set initial states
-        gsap.set(textRef.current, { opacity: 0, y: 40 });
+        // Set initial states explicitly
+        gsap.set(textRef.current, { opacity: 0, y: 40, force3D: true });
         gsap.set([pointer1Ref.current, pointer2Ref.current, pointer3Ref.current, pointer4Ref.current], { 
           opacity: 0, 
           scale: 0,
@@ -390,7 +463,6 @@ export function RevealZoom({
         
         gsap.set(buildingRef.current, { force3D: true, scale: 1, opacity: 1 });
         gsap.set(shapeRef.current, { force3D: true, opacity: 1 });
-        gsap.set(textRef.current, { force3D: true });
         
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -398,15 +470,23 @@ export function RevealZoom({
             start: "top top",
             end: scrollDistance,
             pin: true,
-            scrub: true,
+            scrub: 0.5, // Add slight smoothing
             anticipatePin: 1,
             fastScrollEnd: true,
             preventOverlaps: true,
-            invalidateOnRefresh: true, // Important: recalculate on refresh
+            invalidateOnRefresh: true,
+            onRefresh: () => {
+              // Reset to start position on refresh
+              if (window.scrollY === 0) {
+                animState.current.scale = 1;
+                animState.current.panY = 0;
+                scheduleCanvasDraw();
+              }
+            },
           },
         });
 
-        // PHASE 1: Building zoom (much slower)
+        // PHASE 1: Building zoom
         tl.to(buildingRef.current, {
           scale: buildingZoomScale,
           ease: "none",
@@ -419,7 +499,7 @@ export function RevealZoom({
           duration: 2.5,
         }, 5.5);
         
-        // Shape disappears (much slower)
+        // Shape disappears
         tl.to(shapeRef.current, {
           opacity: 0,
           ease: "none",
@@ -434,7 +514,7 @@ export function RevealZoom({
           duration: 0.8,
         }, 1.5);
 
-        // PHASE 3: Canvas Zoom - comfortable pacing
+        // PHASE 3: Canvas Zoom
         tl.to(animState.current, {
           scale: windowZoomScale,
           duration: 2.0,
@@ -450,7 +530,7 @@ export function RevealZoom({
           duration: 0.5,
         }, 6.0);
 
-        // PHASE 5: Canvas Pan (slower)
+        // PHASE 5: Canvas Pan
         tl.to(animState.current, {
           panY: windowMoveDistance,
           duration: 4.5, 
@@ -458,7 +538,7 @@ export function RevealZoom({
           onUpdate: scheduleCanvasDraw,
         }, 6.5);
 
-        // Animate pointers with relaxed timing
+        // Animate pointers
         const animatePointer = (ref: React.RefObject<HTMLDivElement | null>, inT: number, outT: number) => {
           tl.to(ref.current, { 
             opacity: 1, 
@@ -479,11 +559,11 @@ export function RevealZoom({
         animatePointer(pointer3Ref, 9.8, 11.0);
         animatePointer(pointer4Ref, 11.3, 12.5);
 
-        // Refresh ScrollTrigger after everything is set up
+        // Final refresh after setup
         ScrollTrigger.refresh(true);
 
       }, wrapperRef);
-    }, 50);
+    }, 100);
 
     return () => {
       clearTimeout(initTimeout);
@@ -491,14 +571,27 @@ export function RevealZoom({
       ctxRef.current?.revert();
       isInitializedRef.current = false;
     };
-  }, [scrollDistance, buildingZoomScale, windowZoomScale, windowMoveDistance, scheduleCanvasDraw, imageLoaded, isReady]);
+  }, [scrollDistance, buildingZoomScale, windowZoomScale, windowMoveDistance, scheduleCanvasDraw, imageLoaded, isReady, isMounted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      ScrollTrigger.getAll().forEach(st => st.kill());
     };
   }, []);
+
+  // Don't render anything until mounted to prevent hydration issues
+  if (!isMounted) {
+    return (
+      <section 
+        className="relative w-full bg-black" 
+        style={{ minHeight: '100vh', zIndex: 50 }}
+      >
+        <div className="relative w-full h-screen overflow-hidden bg-black" />
+      </section>
+    );
+  }
 
   return (
     <section 
