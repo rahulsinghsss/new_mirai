@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Rewrites requests for /Amenities (capital A) to the lowercase route
-// while preserving the original URL in the browser (no redirect).
+// Redirect lowercase /amenities to the desired uppercase /Amenities path
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // handle /Amenities and any nested paths like /Amenities/foo
-  if (pathname === '/Amenities' || pathname.startsWith('/Amenities/')) {
+  // If the user requests lowercase /amenities, redirect visibly to /Amenities
+  if (pathname === '/amenities' || pathname.startsWith('/amenities/')) {
     const url = req.nextUrl.clone()
-    url.pathname = pathname.replace(/^\/Amenities/i, '/amenities')
-    return NextResponse.rewrite(url)
+    url.pathname = pathname.replace(/^\/amenities/i, '/Amenities')
+    return NextResponse.redirect(url)
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/Amenities', '/Amenities/:path*'],
+  matcher: ['/amenities', '/amenities/:path*'],
 }
