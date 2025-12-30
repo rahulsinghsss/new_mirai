@@ -3,9 +3,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import reveal from './reveal.png';
-import mirai from './mirai.png';
-import shapeTwo from './shape-two.png';
 import type { StaticImageData } from 'next/image';
 
 if (typeof window !== "undefined") {
@@ -166,9 +163,9 @@ interface ZoomRevealProps {
 }
 
 export function RevealZoom({
-  buildingImage = reveal,
-  windowImage = mirai,
-  shapeImage = shapeTwo,
+  buildingImage = '/images/gateway/reveal.png',
+  windowImage = '/images/gateway/mirai.png',
+  shapeImage = '/images/gateway/shape-two.png',
   scrollDistance = "+=1000%",
   buildingZoomScale = 16,
   windowZoomScale = 2.5,
