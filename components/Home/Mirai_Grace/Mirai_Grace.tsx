@@ -15,6 +15,7 @@ export default function ImageScrollScrubber() {
   // Store static canvas-friendly image sources (ImageBitmap or HTMLImageElement).
   const imagesRef = useRef<CanvasImageSource[]>([]);
   const frameObj = useRef({ frame: 0 }); // Object for GSAP to animate
+  const lastFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -72,6 +73,12 @@ export default function ImageScrollScrubber() {
       const img = imagesRef.current[Math.round(frameObj.current.frame)];
       if (!img) return;
 
+      const roundedFrame = Math.round(frameObj.current.frame);
+      if (lastFrameRef.current !== roundedFrame) {
+        lastFrameRef.current = roundedFrame;
+        console.log('Mirai_Grace render frame', roundedFrame);
+      }
+
       const vw = canvas.width / (window.devicePixelRatio || 1);
       const vh = canvas.height / (window.devicePixelRatio || 1);
       const sw = ('naturalWidth' in img ? (img as HTMLImageElement).naturalWidth : (img as ImageBitmap).width) || (img as any).width || 0;
@@ -115,10 +122,14 @@ export default function ImageScrollScrubber() {
       // Animate frame property from 0 to last index
       tl.to(frameObj.current, {
         frame: imagesRef.current.length - 1,
-        snap: "frame", // Optional: snap to whole numbers
+        snap: { frame: 1 }, // Snap 'frame' property to whole numbers
         ease: "none",
         onUpdate: render
       });
+
+      // Ensure ScrollTrigger is aware of the new pin/size after images are loaded
+      ScrollTrigger.refresh();
+      console.log('Mirai_Grace GSAP init', imagesRef.current.length);
 
       // Initial render
       render();
