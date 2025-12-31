@@ -16,6 +16,7 @@ export default function ImageScrollScrubber() {
   const imagesRef = useRef<CanvasImageSource[]>([]);
   const frameObj = useRef({ frame: 0 }); // Object for GSAP to animate
   const lastFrameRef = useRef<number | null>(null);
+  const debugRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -77,6 +78,7 @@ export default function ImageScrollScrubber() {
       if (lastFrameRef.current !== roundedFrame) {
         lastFrameRef.current = roundedFrame;
         console.log('Mirai_Grace render frame', roundedFrame);
+        if (debugRef.current) debugRef.current.textContent = `frame:${roundedFrame}`;
       }
 
       const vw = canvas.width / (window.devicePixelRatio || 1);
@@ -99,11 +101,12 @@ export default function ImageScrollScrubber() {
       const canvas = canvasRef.current;
       if (!canvas || !sectionRef.current) return;
 
-      // Set canvas size
+      // Set canvas size and use setTransform to avoid cumulative scaling
       const dpr = window.devicePixelRatio || 1;
+      const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
-      canvas.getContext('2d')?.scale(dpr, dpr);
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Create GSAP Timeline
       const tl = gsap.timeline({
@@ -135,6 +138,17 @@ export default function ImageScrollScrubber() {
       console.log('Mirai_Grace ScrollTriggers:', ScrollTrigger.getAll().map(s => ({ start: s.start, end: s.end, trigger: s.trigger })));
       const st = (tl as any).scrollTrigger;
       if (st) console.log('Mirai_Grace timeline.scrollTrigger', { start: st.start, end: st.end, pin: !!st.pin });
+
+      // Create a debug ScrollTrigger to report progress and update the overlay
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "+=300%",
+        onUpdate(self) {
+          console.log('Mirai_Grace ST progress', self.progress);
+          if (debugRef.current) debugRef.current.textContent = `frame:${lastFrameRef.current ?? 0} progress:${self.progress.toFixed(2)}`;
+        }
+      });
 
       // Initial render
       render();
@@ -175,6 +189,9 @@ export default function ImageScrollScrubber() {
             <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
           </div>
         )}
+
+        {/* Visible debug overlay */}
+        <div ref={debugRef} className="absolute top-2 right-2 z-30 text-white bg-black/60 px-2 py-1 rounded text-xs">frame:0</div>
 
         {/* Canvas forced to stay inside viewport */}
         <canvas 
