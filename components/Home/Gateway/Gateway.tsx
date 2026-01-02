@@ -30,8 +30,6 @@ function Hotspot({ title, subtitle, description, position, hideIconOnOpen = fals
           backgroundColor: isHovered ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
           border: '1.5px solid rgba(255, 255, 255, 0.5)',
           boxShadow: isHovered ? '0 0 30px rgba(255,255,255,0.2)' : '0 0 20px rgba(0,0,0,0.5)',
-          // Hide the icon when the description is open for right-positioned hotspots
-          // or when explicitly requested via hideIconOnOpen
           opacity: (position === 'right' && isHovered) || shouldHideIcon ? 0 : 1,
           pointerEvents: (position === 'right' && isHovered) || shouldHideIcon ? 'none' : 'auto',
           transform: (position === 'right' && isHovered) || shouldHideIcon ? 'translateX(8px) scale(0.92)' : 'none',
@@ -163,7 +161,6 @@ export function RevealZoom({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const buildingRef = useRef<HTMLImageElement>(null);
-  const shapeRef = useRef<HTMLImageElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const pointer1Ref = useRef<HTMLDivElement>(null);
   const pointer2Ref = useRef<HTMLDivElement>(null);
@@ -174,10 +171,11 @@ export function RevealZoom({
   const needsDrawRef = useRef(false);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  const isLockedRef = useRef(true); // START LOCKED
+  const isLockedRef = useRef(true);
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const shapeRef = useRef<HTMLImageElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   
   const animState = useRef({
@@ -186,6 +184,8 @@ export function RevealZoom({
     lastScale: -1,
     lastPanY: -1,
   });
+
+
 
   const resolvedBuildingSrc = typeof buildingImage === 'string' ? buildingImage : buildingImage.src;
   const resolvedWindowSrc = typeof windowImage === 'string' ? windowImage : windowImage.src;
@@ -197,17 +197,14 @@ export function RevealZoom({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Disable browser scroll restoration
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
-    // Force scroll to top
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 
-    // Keep locked initially
     isLockedRef.current = true;
 
     setIsMounted(true);
@@ -226,7 +223,6 @@ export function RevealZoom({
       unlocked = true;
       isLockedRef.current = false;
       
-      // Remove all listeners once unlocked
       window.removeEventListener('wheel', unlock);
       window.removeEventListener('touchstart', unlock);
       window.removeEventListener('keydown', handleKeyDown);
@@ -239,16 +235,13 @@ export function RevealZoom({
       }
     };
 
-    // Wait for browser to finish any scroll restoration
     const timer = setTimeout(() => {
-      // Force scroll to 0 one more time
       window.scrollTo(0, 0);
       
-      // Now listen for real user input
       window.addEventListener('wheel', unlock, { passive: true, once: true });
       window.addEventListener('touchstart', unlock, { passive: true, once: true });
       window.addEventListener('keydown', handleKeyDown, { passive: true });
-    }, 500); // Wait 500ms for any browser shenanigans
+    }, 500);
 
     return () => {
       clearTimeout(timer);
@@ -266,11 +259,10 @@ export function RevealZoom({
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        // Page restored from cache - reset everything
         window.scrollTo(0, 0);
         isLockedRef.current = true;
+        if (shapeRef.current) gsap.set(shapeRef.current, { opacity: 1 });
         
-        // Re-lock and wait for user input again
         setTimeout(() => {
           window.scrollTo(0, 0);
           if (timelineRef.current) {
@@ -278,7 +270,7 @@ export function RevealZoom({
           }
         }, 100);
       }
-    };
+    }; 
 
     window.addEventListener('pageshow', handlePageShow);
     return () => window.removeEventListener('pageshow', handlePageShow);
@@ -302,6 +294,9 @@ export function RevealZoom({
 
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
+    
+    // Clear canvas before drawing to prevent artifacts
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     const imgAspect = img.naturalWidth / img.naturalHeight;
     const canvasAspect = displayWidth / displayHeight;
@@ -398,35 +393,29 @@ export function RevealZoom({
 
   // ============================================
   // MAIN ANIMATION SETUP
-  // Uses onUpdate to check lock status
   // ============================================
   useEffect(() => {
     if (typeof window === 'undefined' || !imageLoaded || !isMounted) return;
 
-    // Register GSAP
     gsap.registerPlugin(ScrollTrigger);
 
-    // Kill existing
     ScrollTrigger.getAll().forEach(st => st.kill());
     if (timelineRef.current) timelineRef.current.kill();
 
-    // Force scroll to 0 before setup
     window.scrollTo(0, 0);
 
-    // Reset animation state
     animState.current = { scale: 1, panY: 0, lastScale: -1, lastPanY: -1 };
+    if (shapeRef.current) gsap.set(shapeRef.current, { opacity: 1 });
 
-    // Set initial element states
-    gsap.set(buildingRef.current, { scale: 1, opacity: 1 });
-    gsap.set(shapeRef.current, { opacity: 1 });
-    gsap.set(textRef.current, { opacity: 0, y: 40 });
+    gsap.set(buildingRef.current, { scale: 1, opacity: 1, force3D: true });
+    gsap.set(textRef.current, { opacity: 0, y: 40, force3D: true });
     gsap.set([pointer1Ref.current, pointer2Ref.current, pointer3Ref.current, pointer4Ref.current], { 
       opacity: 0, 
-      scale: 0 
+      scale: 0,
+      force3D: true
     });
 
-    // Create timeline (paused - we'll control it manually)
-    const tl = gsap.timeline({ paused: true });
+    const tl = gsap.timeline({ paused: true, defaults: { overwrite: 'auto', force3D: true } });
     timelineRef.current = tl;
 
     // PHASE 1: Building zoom
@@ -442,6 +431,7 @@ export function RevealZoom({
       duration: 2.5,
     }, 5.5);
     
+    // Shape opacity - animate DOM element directly to avoid React re-renders
     tl.to(shapeRef.current, {
       opacity: 0,
       ease: "none",
@@ -488,31 +478,25 @@ export function RevealZoom({
 
     animatePointer(pointer1Ref, 6.8, 8.0);
     animatePointer(pointer2Ref, 8.3, 9.5);
-    // Make Wellness Spa disappear a bit earlier
     animatePointer(pointer3Ref, 9.8, 10.5);
     animatePointer(pointer4Ref, 11.3, 12.5);
 
-    // Create ScrollTrigger that controls the timeline
     const st = ScrollTrigger.create({
       trigger: wrapperRef.current,
       start: "top top",
       end: scrollDistance,
       pin: true,
-      scrub: 0.5,
+      scrub: 1.5,
       anticipatePin: 1,
       onUpdate: (self) => {
-        // CRITICAL: Only update timeline if unlocked
         if (isLockedRef.current) {
-          // Stay at 0 if locked
           tl.progress(0);
           return;
         }
         
-        // Normal operation - update timeline based on scroll
         tl.progress(self.progress);
       },
       onRefresh: () => {
-        // On refresh, if locked, ensure we're at 0
         if (isLockedRef.current) {
           tl.progress(0);
           window.scrollTo(0, 0);
@@ -522,7 +506,6 @@ export function RevealZoom({
 
     scrollTriggerRef.current = st;
 
-    // Force initial state
     tl.progress(0);
     ScrollTrigger.refresh();
 
@@ -553,24 +536,33 @@ export function RevealZoom({
     <section 
       ref={wrapperRef} 
       className="relative w-full bg-black" 
-      style={{ minHeight: '100vh', zIndex: 50, contain: 'layout style paint' }}
+      style={{ 
+        minHeight: '100vh', 
+        zIndex: 50, 
+        contain: 'layout style paint',
+        isolation: 'isolate',
+      }}
     >
-      <img
-        ref={shapeRef}
-        src={resolvedShapeSrc}
-        alt=""
-        className="fixed top-0 left-1/2 w-full max-w-[100vw] pointer-events-none"
-        style={{ 
-          zIndex: 100,
-          height: 'auto',
-          objectFit: 'contain',
-          transform: 'translateX(-50%) translateZ(0)',
-          willChange: 'opacity',
-          backfaceVisibility: 'hidden',
-        }}
-      />
-
-      <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
+      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+        {/* Shape image - controlled by React state for smooth updates */}
+        <img
+          ref={shapeRef}
+          src={resolvedShapeSrc}
+          alt=""
+          className="absolute top-0 left-1/2 w-full max-w-[100vw]"
+          style={{ 
+            zIndex: 100,
+            height: 'auto',
+            objectFit: 'contain',
+            transform: 'translateX(-50%) translateZ(0)',
+            opacity: 1,
+            visibility: 'visible',
+            willChange: 'opacity, transform',
+            backfaceVisibility: 'hidden',
+            pointerEvents: 'none',
+          }}
+        />
+        
         <canvas 
           ref={canvasRef} 
           className="absolute inset-0 w-full h-full" 
@@ -582,7 +574,7 @@ export function RevealZoom({
             title="SkyPods"
             subtitle="Floors 29-32"
             description="The top floors of the Mirai building are a collection of 16 exclusive SkyPods. Your life will unfold 100 metres above the ground: this is what the elite Club 100 membership reflects."
-            position="right" // icon on the right, text on the left
+            position="right"
           />
         </div>
 
@@ -591,7 +583,7 @@ export function RevealZoom({
             title="Residencies"
             subtitle="Level 35 - Rooftop"
             description="An exclusive rooftop sanctuary featuring panoramic 360-degree views of the city skyline. The perfect setting for private events, sunset cocktails, and unforgettable moments above the clouds."
-            position="left" // icon on the left, text on the right
+            position="left"
             hideIconOnOpen={true}
           />
         </div>

@@ -1,67 +1,118 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
+
 const bgPath = '/images/sixth_ment.png'
 
 export default function SixthElement() {
   const sectionRef = useRef<HTMLDivElement | null>(null)
-  const [showBg, setShowBg] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   useEffect(() => {
-    const el = sectionRef.current
-    if (!el || typeof window === 'undefined') return
+    const handleScroll = () => {
+      if (!sectionRef.current) return
+      
+      const rect = sectionRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      
+      // Calculate scroll progress: 
+      // 0 = bottom of element enters screen
+      // 1 = top of element leaves screen
+      const start = windowHeight
+      const end = -rect.height
+      const current = rect.top
+      
+      const progress = Math.max(0, Math.min(1, (start - current) / (start - end)))
+      
+      setScrollProgress(progress)
+    }
 
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          setShowBg(true)
-        } else {
-          setShowBg(false)
-        }
-      }
-    }, { root: null, rootMargin: '200px', threshold: 0 })
-
-    observer.observe(el)
-    return () => observer.disconnect()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Initialize on mount
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Maps global progress to local element timing
+  const getScrollStyle = (start: number, end: number) => {
+    const localProgress = Math.max(0, Math.min(1, (scrollProgress - start) / (end - start)))
+    
+    return {
+      opacity: localProgress,
+      // Moves text from 60px down up to its natural position (0px)
+      transform: `translateY(${(1 - localProgress) * 60}px)`, 
+      // Micro-transition prevents "jagged" movement on low-precision mouse wheels
+      transition: 'opacity 0.15s linear, transform 0.15s ease-out', 
+    }
+  }
 
   return (
     <section 
-      id="sixth-element-trigger" 
       ref={sectionRef} 
-      className="relative w-full"
+      className="relative w-full overflow-hidden"
       style={{ 
-        backgroundColor: 'transparent',
-        zIndex: 10,
-        position: 'relative'
+        backgroundColor: 'transparent', // Fully transparent container
+        zIndex: 10, 
+        position: 'relative' 
       }}
     >
-      {/* Background Image */}
+      {/* Background Image: Always opaque to prevent flickering */}
       <img
         src={bgPath}
-        alt=""
+        alt="Pavani Mirai Background"
         style={{
           width: '100%',
           height: 'auto',
           display: 'block',
-          opacity: showBg ? 1 : 0,
-          transition: 'opacity 600ms ease-in-out',
+          opacity: 1, 
+          willChange: 'transform',
         }}
       />
 
-      {/* Content */}
-      <h2 
-        className="text-white text-5xl md:text-6xl font-bold"
-        style={{ 
-          position: 'absolute', 
-          top: '50px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 10 
-        }}
-      >
-        Hello
-      </h2>
+      {/* Text Overlay: Content linked to the scroller position */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="max-w-5xl px-6 text-center text-black">
+          
+          {/* Welcome Header: Appears between 15% and 35% of the scroll */}
+          <h1 
+            className="text-sm md:text-xl uppercase tracking-[0.3em] mb-2 md:mb-4 font-light text-black"
+            style={getScrollStyle(0.15, 0.35)}
+          >
+            Welcome to Pavani Mirai
+          </h1>
+
+          {/* Main Title: Appears between 25% and 45% of the scroll */}
+          <h2 
+            className="text-3xl md:text-7xl font-bold leading-tight mb-6 md:mb-10 text-black"
+            style={getScrollStyle(0.25, 0.45)}
+          >
+            Where you Live the <br /> 
+            <span>Sixth Element</span>
+          </h2>
+
+          <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
+            {/* Paragraph 1: Appears between 35% and 55% of the scroll */}
+            <p 
+              className="text-sm md:text-xl leading-relaxed font-normal text-black"
+              style={getScrollStyle(0.35, 0.55)}
+            >
+              Nature crafted five elements — <span className="font-bold">Earth</span> that grounds us. 
+              <span className="font-bold"> Water</span> that nourishes us. 
+              <span className="font-bold"> Fire</span> that warms us. 
+              <span className="font-bold"> Air</span> that breathes through us. 
+              <span className="font-bold"> Space</span> that holds us.
+            </p>
+            
+            {/* Paragraph 2: Appears between 45% and 65% of the scroll */}
+            <p 
+              className="hidden md:block text-lg md:text-xl leading-relaxed font-normal text-black"
+              style={getScrollStyle(0.45, 0.65)}
+            >
+              With Pavani as the catalyst, the <span className="italic font-medium">sixth element</span> takes shape when all the elements are brought together in serene harmony. 
+              This is how Mirai was birthed — to give meaning to all of these elements and to harness their full potential.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

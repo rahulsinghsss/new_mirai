@@ -11,37 +11,50 @@ import ContactForm from './Contact_us/Contact_us'
 import Footer from './Footer/Footer'
 import SixthElement from './Sixth_Element/Sixth_element'
 
-
 const Home = () => {
   return (
-    <div>
-      {/* All sections before Contact - wrapped with higher z-index */}
+    <div className="relative bg-black w-full overflow-x-hidden">
       <div className="relative z-10 bg-black">
         <Hero />
-        {/* Spacer to offset the fixed hero so page content starts after it */}
+        
+        {/* Spacer for Hero */}
         <div className="h-screen" aria-hidden="true" />
-        <SixthElement />
-        {/* Separate sections so each canvas renders within its own DOM container; no visual/layout change */}
-        <section aria-label="Reveal zoom" data-section="reveal-zoom" className="relative">
+        
+        {/* SixthElement - Using z-index 10 */}
+        <div className="relative" style={{ zIndex: 10 }}>
+          <SixthElement />
+        </div>
+        
+        {/* RevealZoom - Using z-index 11 (next in line) */}
+        <section 
+          aria-label="Reveal zoom" 
+          className="relative bg-black"
+          style={{ zIndex: 11, isolation: 'isolate' }}
+        >
           <RevealZoom />
         </section>
-        <section aria-label="Scroll video" data-section="scroll-video" className="relative">
+        
+        {/* Following sections continue the ladder */}
+        <section 
+          aria-label="Scroll video" 
+          className="relative bg-black"
+          style={{ zIndex: 12 }}
+        >
           <Mirai_Grace />
         </section>
-        <MiraiPodsIntro />
-        <MiraiPodsSlider />
-        <ClubhouseIntro />
-        <MiraiClubhouse />
-        <InteractiveMap />
+        
+        <div style={{ position: 'relative', zIndex: 13 }}>
+          <MiraiPodsIntro />
+          <MiraiPodsSlider />
+          <ClubhouseIntro />
+          <MiraiClubhouse />
+          <InteractiveMap />
+        </div>
       </div>
 
-      {/* Contact Form - Fixed position with z-index: 1 */}
+      {/* Fixed UI layers remain at the bottom/top of the stack */}
       <ContactForm />
-
-      {/* Spacer - Creates scroll room to see the fixed contact section */}
       <div className="relative h-screen" style={{ zIndex: 0 }} />
-
-      {/* Footer - Scrolls up and covers the contact section with z-index: 10 */}
       <Footer />
     </div>
   )
