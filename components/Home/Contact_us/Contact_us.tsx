@@ -33,7 +33,7 @@ export default function ContactForm() {
         <div className="absolute inset-0 -z-10 bg-linear-to-r from-white via-gray-100 to-white" aria-hidden="true" />
         <div className="relative z-10 h-full pl-6 lg:pl-12">
           <div className="flex items-center justify-start h-full">
-            <div className="w-full max-w-md bg-white rounded-xl p-8 md:p-10 shadow-2xl">
+            <div className="w-auto bg-white rounded-xl p-8 md:p-10 shadow-2xl" style={{ maxWidth: '340px' }}>
               <h2 className="text-3xl font-bold mb-8 text-gray-900 font-serif">Contact Us</h2>
               <div className="space-y-6">
                 <input 
@@ -79,7 +79,7 @@ export default function ContactForm() {
       
       <div className="relative z-10 h-full pl-6 lg:pl-12">
         <div className="flex items-center justify-start h-full">
-          <div className="w-full max-w-md bg-white rounded-xl p-8 md:p-10 shadow-2xl">
+          <div className="w-auto bg-white rounded-xl p-8 md:p-10 shadow-2xl" style={{ maxWidth: '340px' }}>
             <h2 className="text-3xl font-bold mb-8 text-gray-900 font-serif">Contact Us</h2>
             <div className="space-y-6">
               <input 
