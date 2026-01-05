@@ -27,6 +27,17 @@ const slides: Slide[] = [
   { id: 5, image: CLOUD_IMG, label: 'Space One', title: 'Beyond the Clouds\nInto the Unknown' },
 ];
 
+function renderBoldIfPyro(label: string, title: string) {
+  if (label === 'Pyro Pod') {
+    const [first, ...rest] = title.split('\n');
+    return {
+      label, // normal weight for label
+      title: <><strong>{first}</strong>{'\n'}<strong>{rest.join(' ')}</strong></>
+    };
+  }
+  return { label, title };
+}
+
 export default function MiraiPodsSlider() {
   const [layerAIndex, setLayerAIndex] = useState(0);
   const [layerBIndex, setLayerBIndex] = useState(1);
@@ -320,29 +331,34 @@ export default function MiraiPodsSlider() {
             maxWidth: 400,
           }}
         >
-          <p
-            style={{
-              fontSize: 13,
-              letterSpacing: 3,
-              textTransform: 'uppercase',
-              marginBottom: 16,
-              opacity: 0.85,
-            }}
-          >
-            {slides[currentIndex].label}
-          </p>
-          <h2
-            style={{
-              fontSize: '40px',
-              fontWeight: 300,
-              lineHeight: 1.15,
-              whiteSpace: 'pre-line',
-              fontFamily: ['Space One', 'Avia Pod', 'Terra Pod', 'Sky Pods', 'Aqua Pod', 'Pyro Pod'].includes(slides[currentIndex].label) ? "Migra, var(--font-magra, 'Magra', 'Century Gothic', Arial, sans-serif)" : 'Georgia, serif',
-              margin: 0,
-            }}
-          >
-            {slides[currentIndex].title}
-          </h2>
+          {(() => {
+            const { label, title } = renderBoldIfPyro(slides[currentIndex].label, slides[currentIndex].title);
+            return <>
+              <p
+                style={{
+                  fontSize: 13,
+                  letterSpacing: 3,
+                  textTransform: 'uppercase',
+                  marginBottom: 16,
+                  opacity: 0.85,
+                }}
+              >
+                {label}
+              </p>
+              <h2
+                style={{
+                  fontSize: '40px',
+                  fontWeight: 300,
+                  lineHeight: 1.15,
+                  whiteSpace: 'pre-line',
+                  fontFamily: ['Space One', 'Avia Pod', 'Terra Pod', 'Sky Pods', 'Aqua Pod', 'Pyro Pod'].includes(slides[currentIndex].label) ? "Migra, var(--font-magra, 'Magra', 'Century Gothic', Arial, sans-serif)" : 'Georgia, serif',
+                  margin: 0,
+                }}
+              >
+                {title}
+              </h2>
+            </>;
+          })()}
         </div>
       </div>
 

@@ -452,18 +452,18 @@ export function RevealZoom({
         {/* ========================================================= */}
         {/* Added will-change transform to container divs */}
         
-        <div ref={pointer1Ref} className="absolute" style={{ zIndex: 20, top: '40%', left: '15%', willChange: 'transform' }}>
+        <div ref={pointer1Ref} className="absolute" style={{ zIndex: 20, top: '27%', right: '47%', willChange: 'transform' }}>
           <div ref={pointer1InnerRef} className="opacity-0 scale-90 origin-center">
             <Hotspot 
               title="SkyPods" 
               subtitle="Floors 29-32" 
-              position="right" 
+              position="left" 
               description="The top floors of the Mirai building are a collection of 16 exclusive SkyPods 100 metres above the ground." 
             />
           </div>
         </div>
 
-        <div ref={pointer2Ref} className="absolute" style={{ zIndex: 20, top: '40%', right: '30%', willChange: 'transform' }}>
+        <div ref={pointer2Ref} className="absolute" style={{ zIndex: 20, top: '30%', right: '40%', willChange: 'transform' }}>
           <div ref={pointer2InnerRef} className="opacity-0 scale-90 origin-center">
             <Hotspot 
               title="Residencies" 
@@ -474,7 +474,7 @@ export function RevealZoom({
           </div>
         </div>
 
-        <div ref={pointer3Ref} className="absolute" style={{ zIndex: 20, top: '200%', right: '31%', willChange: 'transform' }}>
+        <div ref={pointer3Ref} className="absolute" style={{ zIndex: 20, top: '190%', right: '40%', willChange: 'transform' }}>
           <div ref={pointer3InnerRef} className="opacity-0 scale-90 origin-center">
             <Hotspot 
               title="Clubhouse" 
@@ -485,12 +485,12 @@ export function RevealZoom({
           </div>
         </div>
 
-        <div ref={pointer4Ref} className="absolute" style={{ zIndex: 20, top: '212%', left: '10%', willChange: 'transform' }}>
+        <div ref={pointer4Ref} className="absolute" style={{ zIndex: 20, top: '206%', right: '40%', willChange: 'transform' }}>
           <div ref={pointer4InnerRef} className="opacity-0 scale-90 origin-center">
             <Hotspot 
               title="Podium Level" 
               subtitle="Gardens" 
-              position="right" 
+              position="left" 
               description="Landscaped terraces and secret gardens create tranquil retreats within the urban landscape." 
             />
           </div>
