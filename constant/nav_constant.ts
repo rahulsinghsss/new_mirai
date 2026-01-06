@@ -29,7 +29,7 @@ export const NAV_LINKS: NavLink[] = [
   { 
     id: 4, 
     label: 'Map', 
-    href: './Maps.html',
+    href: './Maps',
     description: 'View the detailed layout of our community with interactive maps and facility locations for your convenience.'
   },
   { 
