@@ -40,14 +40,12 @@ const Nav = () => {
       document.documentElement.classList.remove('overflow-hidden')
     }
 
-    // Cleanup on unmount to avoid leaving the document locked if the component
-    // unmounts while the menu is open for any reason (route change, HMR, etc.)
     return () => {
       try {
         document.body.classList.remove('overflow-hidden')
         document.documentElement.classList.remove('overflow-hidden')
       } catch (e) {
-        // noop in non-browser environments
+        // noop
       }
     }
   }, [isOpen])
@@ -163,8 +161,6 @@ const Nav = () => {
             overflow: 'hidden',
             backgroundColor: '#000'
           }}>
-            {/* Heading removed per request */}
-            
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -238,7 +234,8 @@ const Nav = () => {
                 ref={containerRef}
                 style={{
                   transformStyle: 'preserve-3d',
-                  transform: `rotateZ(-20deg) rotateX(-10deg) translateY(16px) rotateY(${activeIndex * -72}deg)`,
+                  /* CHANGED: Adjusted translateY from -30px to 10px to move it further down */
+                  transform: `rotateZ(-20deg) rotateX(-10deg) translateY(10px) rotateY(${activeIndex * -72}deg)`,
                   transition: 'transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)',
                   width: '460px',
                   height: '640px',
@@ -251,7 +248,7 @@ const Nav = () => {
                 {carouselImages.map((img, index) => {
                   const angle = (index * 360) / carouselImages.length
                   const radius = 170
-                   
+                    
                   return (
                     <div
                       key={index}
@@ -293,8 +290,6 @@ const Nav = () => {
                 })}
               </div>
             </div>
-
-            {/* Carousel Controls removed */}
           </div>
 
           {/* Right Section - Description & CTA (1/3) */}
