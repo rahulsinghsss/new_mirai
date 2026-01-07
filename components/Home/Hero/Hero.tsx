@@ -1,18 +1,19 @@
 'use client'
-
 import React, { useRef, useEffect } from 'react'
 import Image from 'next/image'
+
 const HERO_LOGO = '/images/logo_1.png'
 
 const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const gsapRef = useRef<any>(null)
   const [videoReady, setVideoReady] = React.useState(false)
   const [isHidden, setIsHidden] = React.useState(false)
 
   useEffect(() => {
-    if (!videoRef.current) return
-    videoRef.current.play().catch(() => {})
+    if (typeof window !== 'undefined' && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
   }, [])
 
   const handleCanPlay = () => {
@@ -21,11 +22,16 @@ const Hero = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
     Promise.all([import('gsap'), import('gsap/ScrollToPlugin')])
       .then(([gsapModule, scrollModule]) => {
         const gsap = gsapModule.gsap || gsapModule.default || gsapModule
         const ScrollToPlugin = scrollModule.ScrollToPlugin || scrollModule.default || scrollModule
-        try { gsap.registerPlugin(ScrollToPlugin) } catch(e) {}
+
+        try {
+          gsap.registerPlugin(ScrollToPlugin)
+        } catch(e) {}
+
         gsapRef.current = gsap
       })
   }, [])
@@ -37,14 +43,13 @@ const Hero = () => {
     const handleScroll = () => {
       const scrollY = window.scrollY
       const windowHeight = window.innerHeight
-
+      
       // Hide the hero video once the user scrolls past the hero section
       setIsHidden(scrollY >= windowHeight - 5)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // Initial check
-
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -52,7 +57,7 @@ const Hero = () => {
     position: 'absolute',
     top: '50%',
     left: '50%',
-    width: '101%', 
+    width: '101%',
     height: '101%',
     transform: 'translate(-50%, -50%)',
     objectFit: 'cover',
@@ -63,49 +68,50 @@ const Hero = () => {
   };
 
   return (
-    <section style={{ 
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100vh', 
-      backgroundColor: '#000',
-      overflow: 'hidden', 
-      margin: 0,
-      padding: 0,
-      zIndex: 0, // lower z-index so page content can overlap on scroll
-      pointerEvents: 'none', // allow interactions with overlapping content
-      opacity: isHidden ? 0 : 1,
-      visibility: isHidden ? 'hidden' : 'visible',
-      transition: 'opacity 0.4s ease, visibility 0.4s ease'
-    }}>
-      {/* Logo - top center */}
-      <div style={{ position: 'absolute', left: 0, top: 40, width: '100%', zIndex: 10, pointerEvents: 'none' }} aria-hidden="true">
-        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <div style={{ height: '1px', background: '#fff', opacity: 0.9, flex: 1 }} />
-
-          <div style={{ padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Image src={HERO_LOGO} alt="Mirai logo" width={240} height={88} style={{ height: 'auto', display: 'block' }} priority unoptimized />
-          </div>
-
-          <div style={{ height: '1px', background: '#fff', opacity: 0.9, flex: 1 }} />
+    <section className="fixed top-0 left-0 w-full h-screen overflow-hidden bg-black" style={{ zIndex: 5 }}>
+      {/* Logo - top center with full-width lines */}
+      <div className="absolute top-8 left-0 right-0 z-10 flex items-center px-8">
+        {/* Left line */}
+        <div className="flex-1 h-[1px] bg-white/60"></div>
+        
+        {/* Logo */}
+        <div className="mx-6">
+          <Image
+            src={HERO_LOGO}
+            alt="Logo"
+            width={200}
+            height={80}
+            priority
+          />
         </div>
+        
+        {/* Right line */}
+        <div className="flex-1 h-[1px] bg-white/60"></div>
       </div>
 
       {/* Video Background */}
       <video
         ref={videoRef}
-        style={{ ...fullScreenMediaStyle, opacity: videoReady ? 1 : 0, transition: 'opacity 300ms ease' }}
-        crossOrigin="anonymous"
         autoPlay
-        muted
         loop
+        muted
         playsInline
         preload="auto"
-        onCanPlay={() => { handleCanPlay(); setVideoReady(true); }}
+        style={{
+          ...fullScreenMediaStyle,
+          opacity: isHidden ? 0 : (videoReady ? 1 : 0),
+          transition: 'opacity 0.5s ease-in-out'
+        }}
+        onCanPlay={() => {
+          handleCanPlay();
+          setVideoReady(true);
+        }}
         onLoadedData={() => setVideoReady(true)}
       >
-        <source src="/videos/mirai_home_1.mp4" type="video/mp4" />
+        <source 
+          src="https://d3p1hokpi6aqc3.cloudfront.net/mirai_home_1.mp4" 
+          type="video/mp4" 
+        />
       </video>
     </section>
   )
