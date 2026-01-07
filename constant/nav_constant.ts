@@ -35,7 +35,7 @@ export const NAV_LINKS: NavLink[] = [
   { 
     id: 5, 
     label: 'Life @ MIRAI', 
-    href: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/lifeatmirais.html',
+    href: './Life@Mirai',
     description: 'Join our vibrant community and experience a lifestyle filled with events, activities, and meaningful connections with neighbors.'
   },
   { 
