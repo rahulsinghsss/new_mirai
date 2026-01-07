@@ -64,33 +64,35 @@ const Hotspot = memo<HotspotProps>(({ title, subtitle, description, position, hi
     willChange: 'transform, opacity'
   }), []);
 
-  const iconStyle = useMemo(() => ({
+  const isIconHidden = (position === 'right' && isHovered) || shouldHideIcon;
+
+  const iconStyle = useMemo<React.CSSProperties>(() => ({
     backgroundColor: isHovered ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)',
     border: '1.5px solid rgba(255, 255, 255, 0.5)',
     boxShadow: isHovered ? '0 0 20px rgba(255,255,255,0.3)' : '0 0 10px rgba(0,0,0,0.5)',
-    opacity: (position === 'right' && isHovered) || shouldHideIcon ? 0 : 1,
-    pointerEvents: ((position === 'right' && isHovered) || shouldHideIcon ? 'none' : 'auto') as const,
-    transform: (position === 'right' && isHovered) || shouldHideIcon ? 'translateX(8px) scale(0.92)' : 'none',
-  }), [isHovered, position, shouldHideIcon]);
+    opacity: isIconHidden ? 0 : 1,
+    pointerEvents: isIconHidden ? 'none' : 'auto',
+    transform: isIconHidden ? 'translateX(8px) scale(0.92)' : 'none',
+  }), [isHovered, isIconHidden]);
 
-  const labelStyle = useMemo(() => ({
+  const labelStyle = useMemo<React.CSSProperties>(() => ({
     opacity: isHovered ? 0 : 1,
     transform: isHovered ? (position === 'left' ? 'translateX(12px)' : 'translateX(-12px)') : 'translateX(0)',
-    willChange: 'transform, opacity' as const,
+    willChange: 'transform, opacity',
   }), [isHovered, position]);
 
-  const cardContainerStyle = useMemo(() => ({
+  const cardContainerStyle = useMemo<React.CSSProperties>(() => ({
     maxWidth: isHovered ? '400px' : '0px',
     opacity: isHovered ? 1 : 0,
     marginLeft: position === 'left' ? '-15px' : '0',
     marginRight: position === 'right' ? '-15px' : '0',
     paddingLeft: position === 'left' ? '25px' : '0',
     paddingRight: position === 'right' ? '25px' : '0',
-    pointerEvents: 'auto' as const,
-    willChange: 'max-width, opacity' as const,
+    pointerEvents: 'auto',
+    willChange: 'max-width, opacity',
   }), [isHovered, position]);
 
-  const cardStyle = useMemo(() => ({
+  const cardStyle = useMemo<React.CSSProperties>(() => ({
     minWidth: '300px',
     backgroundColor: 'rgba(10, 10, 10, 0.90)',
     backdropFilter: 'blur(10px)',
@@ -452,17 +454,17 @@ function RevealZoom({
   }, [imageLoaded, isMounted, buildingZoomScale, windowZoomScale, windowMoveDistance, scrollDistance, scheduleCanvasDraw]);
 
   // Memoized styles
-  const shapeStyle = useMemo(() => ({
+  const shapeStyle = useMemo<React.CSSProperties>(() => ({
     zIndex: 100,
     height: 'auto',
-    objectFit: 'contain' as const,
-    willChange: 'opacity' as const,
-    backfaceVisibility: 'hidden' as const
+    objectFit: 'contain',
+    willChange: 'opacity',
+    backfaceVisibility: 'hidden'
   }), []);
 
-  const buildingStyle = useMemo(() => ({
-    willChange: 'transform, opacity' as const,
-    backfaceVisibility: 'hidden' as const,
+  const buildingStyle = useMemo<React.CSSProperties>(() => ({
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden',
     transform: 'translateZ(0)'
   }), []);
 
