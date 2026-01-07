@@ -13,18 +13,18 @@ import SixthElement from './Sixth_Element/Sixth_element'
 
 const Home = () => {
   return (
-    <div className="relative bg-black w-full overflow-x-hidden">
-      {/* Contact Form - Fixed, lowest z-index among fixed elements */}
-      <ContactForm />
+    <div className="relative w-full overflow-x-hidden" style={{ backgroundColor: '#1a1a2e' }}>
+      {/* Fixed background layers (lowest z-index) */}
+      <ContactForm />  {/* z-index: 4 */}
+      <Hero />         {/* z-index: 5 */}
       
-      <div className="relative z-10 bg-black">
-        <Hero />
-        
+      {/* Scrollable content (higher z-index to cover fixed elements) */}
+      <div className="relative" style={{ zIndex: 10 }}>
         {/* Spacer for Hero */}
         <div className="h-screen" aria-hidden="true" />
         
         {/* SixthElement */}
-        <div className="relative" style={{ zIndex: 10 }}>
+        <div className="relative bg-black">
           <SixthElement />
         </div>
         
@@ -32,7 +32,7 @@ const Home = () => {
         <section 
           aria-label="Reveal zoom" 
           className="relative bg-black"
-          style={{ zIndex: 11, isolation: 'isolate' }}
+          style={{ isolation: 'isolate' }}
         >
           <RevealZoom />
         </section>
@@ -41,13 +41,12 @@ const Home = () => {
         <section 
           aria-label="Scroll video" 
           className="relative bg-black"
-          style={{ zIndex: 12 }}
         >
           <Mirai_Grace />
         </section>
         
-        {/* Main content sections - HIGHER z-index to cover ContactForm */}
-        <div className="relative bg-white" style={{ zIndex: 25 }}>
+        {/* Main content sections */}
+        <div className="relative bg-white">
           <MiraiPodsIntro />
           <MiraiPodsSlider />
           <ClubhouseIntro />
@@ -57,10 +56,10 @@ const Home = () => {
       </div>
 
       {/* Spacer to allow scrolling to reveal ContactForm */}
-      <div className="relative h-screen" style={{ zIndex: 0 }} />
+      <div className="h-screen" style={{ backgroundColor: 'transparent' }} />
       
-      {/* Footer - highest z-index */}
-      <div className="relative" style={{ zIndex: 30 }}>
+      {/* Footer */}
+      <div className="relative" style={{ zIndex: 15 }}>
         <Footer />
       </div>
     </div>
