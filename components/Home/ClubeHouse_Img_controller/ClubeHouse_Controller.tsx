@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, memo, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, memo, useCallback, useMemo, useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
 
 const SHAPE_TWO_PATH = '/images/shape-two-pods.png';
 const DEFAULT_BG = 'https://images.unsplash.com/photo-1767509778340-7664ab6583ae?w=1600&q=80&auto=format&fit=crop';
@@ -66,15 +66,6 @@ const LEVELS: Level[] = [
   }
 ];
 
-// Memoized animation variants
-const bgVariants = {
-  initial: { opacity: 0, scale: 1.05 },
-  animate: { opacity: 1, scale: 1 }
-};
-
-const bgTransition = { duration: 0.5, ease: 'easeInOut' };
-const panelTransition = { duration: 0.5, ease: 'easeOut' };
-
 // Memoized sub-components
 interface AmenityItemProps {
   amenity: Amenity;
@@ -138,34 +129,81 @@ const LevelColumn = memo<LevelColumnProps>(({
   onLevelHover, 
   onLowerZoneHover, 
   onAmenityHover 
-}) => (
-  <div className={`relative h-full ${levelIndex < 3 ? 'border-r border-gray-700/30' : ''}`}>
-    <div 
-      className="absolute top-0 left-0 w-full h-[50%]"
-      onMouseEnter={() => onLevelHover(levelIndex)}
-    />
-    
-    <div 
-      className="absolute bottom-0 left-0 w-full h-[50%]"
-      onMouseEnter={() => onLowerZoneHover(levelIndex)}
-    />
+}) => {
+  const panelRef = useRef<HTMLDivElement>(null);
 
-    <motion.div
-      initial={{ y: '100%' }}
-      animate={{ y: showPanel ? '0%' : '100%' }}
-      transition={panelTransition}
-      className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white px-6 md:px-8 py-8"
-    >
-      <div className="space-y-3">
-        {level.amenities.map((amenity, idx) => (
-          <AmenityItem key={idx} amenity={amenity} onHover={onAmenityHover} />
-        ))}
+  useEffect(() => {
+    if (panelRef.current) {
+      gsap.to(panelRef.current, {
+        yPercent: showPanel ? 0 : 100,
+        duration: 0.5,
+        ease: 'power2.out'
+      });
+    }
+  }, [showPanel]);
+
+  return (
+    <div className={`relative h-full ${levelIndex < 3 ? 'border-r border-gray-700/30' : ''}`}>
+      <div 
+        className="absolute top-0 left-0 w-full h-[50%]"
+        onMouseEnter={() => onLevelHover(levelIndex)}
+      />
+      
+      <div 
+        className="absolute bottom-0 left-0 w-full h-[50%]"
+        onMouseEnter={() => onLowerZoneHover(levelIndex)}
+      />
+
+      <div
+        ref={panelRef}
+        className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white px-6 md:px-8 py-8"
+        style={{ transform: 'translateY(100%)' }}
+      >
+        <div className="space-y-3">
+          {level.amenities.map((amenity, idx) => (
+            <AmenityItem key={idx} amenity={amenity} onHover={onAmenityHover} />
+          ))}
+        </div>
       </div>
-    </motion.div>
-  </div>
-));
+    </div>
+  );
+});
 
 LevelColumn.displayName = 'LevelColumn';
+
+// Background component with GSAP animation
+interface AnimatedBackgroundProps {
+  currentBg: string;
+}
+
+const AnimatedBackground = memo<AnimatedBackgroundProps>(({ currentBg }) => {
+  const bgRef = useRef<HTMLDivElement>(null);
+  const prevBgRef = useRef<string>(currentBg);
+
+  useEffect(() => {
+    if (bgRef.current && prevBgRef.current !== currentBg) {
+      gsap.fromTo(bgRef.current, 
+        { opacity: 0, scale: 1.05 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.inOut' }
+      );
+      prevBgRef.current = currentBg;
+    }
+  }, [currentBg]);
+
+  const bgStyle = useMemo(() => ({ 
+    backgroundImage: `url('${currentBg}')` 
+  }), [currentBg]);
+
+  return (
+    <div 
+      ref={bgRef}
+      className="absolute inset-0 bg-cover bg-center"
+      style={bgStyle}
+    />
+  );
+});
+
+AnimatedBackground.displayName = 'AnimatedBackground';
 
 function MiraiClubhouse() {
   const [activeLevel, setActiveLevel] = useState<number | null>(null);
@@ -181,7 +219,7 @@ function MiraiClubhouse() {
   const handleLowerZoneHover = useCallback((levelIndex: number) => {
     setActiveLevel(levelIndex);
     setCurrentBg(LEVELS[levelIndex].defaultImage);
-    setShowPanels(prev => {
+    setShowPanels(() => {
       const newPanels = [false, false, false, false];
       newPanels[levelIndex] = true;
       return newPanels;
@@ -198,25 +236,13 @@ function MiraiClubhouse() {
     setShowPanels([false, false, false, false]);
   }, []);
 
-  const bgStyle = useMemo(() => ({ 
-    backgroundImage: `url('${currentBg}')` 
-  }), [currentBg]);
-
   return (
     <section 
       className="relative bg-black w-full h-screen overflow-hidden"
       onMouseLeave={handleGlobalLeave}
     >
-      {/* Background with transition */}
-      <motion.div 
-        key={currentBg}
-        variants={bgVariants}
-        initial="initial"
-        animate="animate"
-        transition={bgTransition}
-        className="absolute inset-0 bg-cover bg-center"
-        style={bgStyle}
-      />
+      {/* Background with GSAP transition */}
+      <AnimatedBackground currentBg={currentBg} />
 
       {/* Decorative shape */}
       <div className="absolute inset-0 pointer-events-none z-[50] overflow-hidden">
