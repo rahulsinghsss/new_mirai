@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo, useCallback } from 'react';
 import Image from 'next/image';
 import BlurText from '../BlurText';
 
@@ -10,70 +10,71 @@ interface AnimatedElementProps {
   className?: string;
 }
 
-const AnimatedElement: React.FC<AnimatedElementProps> = ({ 
+const AnimatedElement: React.FC<AnimatedElementProps> = memo(({ 
   delay = 0, 
   children, 
   className = '' 
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
+          timeoutRef.current = setTimeout(() => setIsVisible(true), delay);
         } else {
-          // allow repeated animations by toggling visibility on leave
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
           setIsVisible(false);
         }
       },
       { 
-        root: null, 
         rootMargin: '0px 0px -12% 0px', 
         threshold: 0 
       }
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
+    observer.observe(element);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [delay]);
+
+  const renderChildren = useCallback(() => {
+    return React.Children.map(children, (child) => {
+      if (React.isValidElement(child) && typeof child.type !== 'string') {
+        return React.cloneElement(child as React.ReactElement<any>, { play: isVisible });
+      }
+      return child;
+    });
+  }, [children, isVisible]);
 
   return (
     <div
       ref={elementRef}
-      className={`
-        transition-all duration-700 ease-out
-        ${isVisible 
+      className={`transition-all duration-700 ease-out ${
+        isVisible 
           ? 'opacity-100 translate-y-0 scale-100' 
           : 'opacity-0 translate-y-8 scale-[0.99]'
-        }
-        ${className}
-      `}
+      } ${className}`}
     >
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          // Only pass `play` to custom React components (non-primitive elements).
-          // Primitive DOM elements have a string `type` (e.g. 'div', 'h2') and should not receive the prop.
-          if (typeof child.type === 'string') return child;
-
-          // Cast to ReactElement with an index signature so TypeScript accepts the extra prop
-          return React.cloneElement(child as React.ReactElement<any>, { play: isVisible });
-        }
-        return child;
-      })}
+      {renderChildren()}
     </div>
   );
-};
+});
 
-const MiraiPodsIntro: React.FC = () => {
+AnimatedElement.displayName = 'AnimatedElement';
+
+const BLUR_TEXT_CONTENT = "At 220 metres, the elements rise and shape themselves into an elevated world of leisure and luxury in perfect harmony - the four sculpted Sky Pods. Each pod here is an ode to the four eternal elements of nature. Beyond them, space unfolds as the fifth, while Pavani Mirai gives rise to the sixth - life itself.";
+
+const MiraiPodsIntro: React.FC = memo(() => {
   return (
-    /* 1. Added z-index to slide OVER the previous scrubber 
-       2. Changed overflow to hidden to stop horizontal scrolling
-    */
     <section className="relative mt-0 lg:-mt-2 py-16 lg:py-32 bg-white overflow-hidden z-20">
       <div className="container max-w-275 mx-auto px-4 lg:px-6 relative z-10">
         <div className="text-center lg:px-20">
@@ -87,7 +88,7 @@ const MiraiPodsIntro: React.FC = () => {
 
           <AnimatedElement delay={150} className="max-w-200 mx-auto">
             <BlurText
-              text={"At 220 metres, the elements rise and shape themselves into an elevated world of leisure and luxury in perfect harmony - the four sculpted Sky Pods. Each pod here is an ode to the four eternal elements of nature. Beyond them, space unfolds as the fifth, while Pavani Mirai gives rise to the sixth - life itself."}
+              text={BLUR_TEXT_CONTENT}
               delay={300}
               animateBy="words"
               direction="top"
@@ -97,24 +98,24 @@ const MiraiPodsIntro: React.FC = () => {
         </div>
       </div>
 
-      {/* Background shape fix: 
-          Added a container with overflow-hidden specifically for the background 
-      */}
+      {/* Background shape - lazy loaded decorative image */}
       <div className="hidden lg:block absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute right-[-5%] top-10 w-[55%] opacity-[0.12]">
           <Image
             src="/media/shape-two.png"
-            alt="Background shape"
+            alt=""
             width={760}
             height={600}
-            unoptimized
+            loading="lazy"
+            decoding="async"
             className="w-full h-auto drop-shadow-[0_10px_300px_rgba(0,0,0,0.1)]"
-            priority
           />
         </div>
       </div>
     </section>
   );
-};
+});
+
+MiraiPodsIntro.displayName = 'MiraiPodsIntro';
 
 export default MiraiPodsIntro;
