@@ -1,6 +1,5 @@
 'use client';
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo, useCallback } from 'react';
 import Image from 'next/image';
 import BlurText from '../BlurText';
 
@@ -10,36 +9,50 @@ interface AnimatedElementProps {
   className?: string;
 }
 
-const AnimatedElement: React.FC<AnimatedElementProps> = ({ 
+const AnimatedElement: React.FC<AnimatedElementProps> = memo(({ 
   children, 
   delay = 0, 
   className = '' 
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
+          timeoutRef.current = setTimeout(() => setIsVisible(true), delay);
         } else {
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
           setIsVisible(false);
         }
       },
       { 
-        root: null, 
         rootMargin: '0px 0px -12% 0px', 
         threshold: 0 
       }
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
+    observer.observe(element);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [delay]);
+
+  const renderChildren = useCallback(() => {
+    return React.Children.map(children, (child) => {
+      if (React.isValidElement(child) && typeof child.type !== 'string') {
+        return React.cloneElement(child as React.ReactElement<any>, { play: isVisible });
+      }
+      return child;
+    });
+  }, [children, isVisible]);
 
   return (
     <div
@@ -50,19 +63,16 @@ const AnimatedElement: React.FC<AnimatedElementProps> = ({
           : 'opacity-0 translate-y-5.5 scale-[0.995]'
       } ${className}`}
     >
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          // Avoid passing `play` prop to DOM nodes (h2, p), pass only to custom components like BlurText
-          if (typeof child.type === 'string') return child;
-          return React.cloneElement(child as React.ReactElement<any>, { play: isVisible });
-        }
-        return child;
-      })}
+      {renderChildren()}
     </div>
   );
-};
+});
 
-export default function ClubhouseIntro() {
+AnimatedElement.displayName = 'AnimatedElement';
+
+const BLUR_TEXT_CONTENT = "Nature crafted five elements - Earth that grounds us. Water that nourishes us. Fire that warms us. Air that breathes through us. Space that holds us.";
+
+function ClubhouseIntro() {
   return (
     <section className="relative py-16 lg:py-20 bg-white">
       <div className="container max-w-275 mx-auto px-10 lg:px-0">
@@ -76,7 +86,7 @@ export default function ClubhouseIntro() {
           
           <AnimatedElement delay={120} className="max-w-200 mx-auto">
             <BlurText
-              text={"Nature crafted five elements - Earth that grounds us. Water that nourishes us. Fire that warms us. Air that breathes through us. Space that holds us."}
+              text={BLUR_TEXT_CONTENT}
               delay={300}
               animateBy="words"
               direction="top"
@@ -86,18 +96,20 @@ export default function ClubhouseIntro() {
         </div>
       </div>
       
-      {/* Shape decoration - hidden on mobile */}
+      {/* Shape decoration - hidden on mobile, lazy loaded */}
       <div className="hidden lg:block absolute -right-[6%] top-2.5 w-[55%] max-w-175 opacity-[0.12] pointer-events-none">
         <Image
           src="/media/shape-two.png"
-          alt="About mirai shape"
+          alt=""
           width={760}
           height={400}
-          unoptimized
+          loading="lazy"
+          decoding="async"
           className="w-full h-auto drop-shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
-          priority={false}
         />
       </div>
     </section>
   );
 }
+
+export default memo(ClubhouseIntro);
