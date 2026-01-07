@@ -1,28 +1,113 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-const nightViewPath = '/images/night_view.png';
-const footerLogoPath = '/images/footer_logo.png';
-const helperLogoPath = '/images/logo.png';
 
-export default function Footer() {
+const FOOTER_LOGO_PATH = '/images/footer_logo.png';
+const HELPER_LOGO_PATH = '/images/logo.png';
+const PATH_LENGTH = 307.919;
+const CURRENT_YEAR = new Date().getFullYear();
+
+// Memoized social link component
+interface SocialLinkProps {
+  href: string;
+  label: string;
+  icon: string;
+}
+
+const SocialLink = memo<SocialLinkProps>(({ href, label, icon }) => (
+  <Link 
+    href={href} 
+    className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 text-lg"
+    aria-label={label}
+  >
+    <i className={`bi bi-${icon}`}></i>
+  </Link>
+));
+
+SocialLink.displayName = 'SocialLink';
+
+// Memoized contact link component
+interface ContactLinkProps {
+  href: string;
+  icon: string;
+  children: React.ReactNode;
+  alignTop?: boolean;
+}
+
+const ContactLink = memo<ContactLinkProps>(({ href, icon, children, alignTop }) => (
+  <Link 
+    href={href} 
+    className={`text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 flex ${alignTop ? 'items-start' : 'items-center'} gap-2`}
+  >
+    <i className={`bi bi-${icon} text-[#f5f5f5] ${alignTop ? 'mt-1' : ''}`}></i>
+    {children}
+  </Link>
+));
+
+ContactLink.displayName = 'ContactLink';
+
+// Memoized back to top button
+interface BackToTopProps {
+  show: boolean;
+  progress: number;
+  onClick: () => void;
+}
+
+const BackToTopButton = memo<BackToTopProps>(({ show, progress, onClick }) => {
+  const strokeStyle = useMemo(() => ({
+    strokeDasharray: `${PATH_LENGTH} ${PATH_LENGTH}`,
+    strokeDashoffset: PATH_LENGTH * (1 - progress),
+    transition: 'stroke-dashoffset 150ms linear'
+  }), [progress]);
+
+  return (
+    <button
+      onClick={onClick}
+      className={`fixed right-5 bottom-5 w-14 h-14 rounded-full bg-white/3 flex items-center justify-center cursor-pointer z-50 transition-all duration-300 hover:bg-white/6 ${
+        show ? 'opacity-95' : 'opacity-0 pointer-events-none'
+      }`}
+      aria-label="Scroll to top"
+    >
+      <svg className="w-11 h-11" viewBox="-1 -1 102 102">
+        <path
+          d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="6"
+          strokeLinecap="round"
+          style={strokeStyle}
+        />
+      </svg>
+    </button>
+  );
+});
+
+BackToTopButton.displayName = 'BackToTopButton';
+
+function Footer() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showFallbackLogo, setShowFallbackLogo] = useState(false);
-  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
-    // Wait for full page load before showing the footer to avoid flash during page load
+    let ticking = false;
+
     const handleScroll = () => {
-      const scroll = window.pageYOffset || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = Math.max(0, Math.min(1, scroll / Math.max(1, height)));
-      
-      setScrollProgress(progress);
-      setShowBackToTop(scroll > 50);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scroll = window.pageYOffset || document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = Math.max(0, Math.min(1, scroll / Math.max(1, height)));
+          
+          setScrollProgress(progress);
+          setShowBackToTop(scroll > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     const onLoad = () => setIsVisible(true);
@@ -34,7 +119,7 @@ export default function Footer() {
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -42,11 +127,29 @@ export default function Footer() {
     };
   }, []);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const pathLength = 307.919; // Approximate path length for the SVG circle
+  const handleLogoError = useCallback(() => {
+    setShowFallbackLogo(true);
+  }, []);
+
+  const bgStyle = useMemo(() => ({
+    backgroundImage: "url('/images/night_view.png')",
+    backgroundSize: 'cover',
+    backgroundAttachment: 'fixed',
+    backgroundPosition: 'center',
+    zIndex: -10,
+  }), []);
+
+  const visibilityClass = useCallback((delay: string, type: 'translate' | 'scale' = 'translate') => {
+    const base = isVisible ? 'opacity-100' : 'opacity-0';
+    const transform = type === 'translate' 
+      ? (isVisible ? 'translate-y-0' : 'translate-y-4')
+      : (isVisible ? 'scale-100' : 'scale-95');
+    return `transition-all duration-500 ${delay} ${base} ${transform}`;
+  }, [isVisible]);
 
   return (
     <footer
@@ -57,20 +160,12 @@ export default function Footer() {
     >
       <div
         className="absolute inset-0 -z-10 bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/night_view.png')",
-          backgroundSize: 'cover',
-          backgroundAttachment: 'fixed',
-          backgroundPosition: 'center',
-          zIndex: -10,
-        }}
+        style={bgStyle}
         aria-hidden="true"
       />
 
-      {/* Background overlay for readability (lighter so image remains visible) */}
       <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
 
-      {/* Black gradient behind content - left side only */}
       <div 
         className="absolute inset-0 w-1/2 bg-linear-to-r from-black/80 via-black/50 to-transparent pointer-events-none"
         aria-hidden="true"
@@ -80,93 +175,56 @@ export default function Footer() {
         <div className="flex items-center h-full">
           <div className="max-w-md">
             {/* Logo */}
-            <div className={`mb-8 transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className={`mb-8 ${visibilityClass('')}`}>
               <Image
-                src={showFallbackLogo ? helperLogoPath : footerLogoPath}
+                src={showFallbackLogo ? HELPER_LOGO_PATH : FOOTER_LOGO_PATH}
                 alt={showFallbackLogo ? 'Fallback logo' : 'Mirai Footer Logo'}
                 width={160}
                 height={48}
                 className="w-auto h-auto max-w-50 lg:max-w-60 drop-shadow-md block"
                 priority
-                unoptimized
-                onError={() => setShowFallbackLogo(true)}
+                onError={handleLogoError}
                 style={{ filter: 'none' }}
               />
             </div>
 
             {/* Description */}
-            <p className={`mb-8 text-base lg:text-lg transition-all duration-500 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <p className={`mb-8 text-base lg:text-lg ${visibilityClass('delay-100')}`}>
               Here Earth, Water, Fire, Air and Space come together to catalyse <br className="hidden lg:block" /> 
               a sixth element of life that feels like it was built for you.
             </p>
 
             {/* Contact Section */}
-            <div className={`flex flex-col gap-2 py-2 mb-8 transition-all duration-500 delay-200 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+            <div className={`flex flex-col gap-2 py-2 mb-8 ${visibilityClass('delay-200', 'scale')}`}>
               <p className="mb-2 font-bold text-[#f5f5f5] tracking-wide">
                 <span>Contact Us :</span>
               </p>
-              <Link 
-                href="tel:+919876543212" 
-                className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 flex items-center gap-2"
-              >
-                <i className="bi bi-phone text-[#f5f5f5]"></i>
+              <ContactLink href="tel:+919876543212" icon="phone">
                 +91 9876543212
-              </Link>
-              <Link 
-                href="mailto:info@pavanimirai.com" 
-                className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 flex items-center gap-2"
-              >
-                <i className="bi bi-envelope text-[#f5f5f5]"></i>
+              </ContactLink>
+              <ContactLink href="mailto:info@pavanimirai.com" icon="envelope">
                 info@pavanimirai.com
-              </Link>
-              <Link 
-                href="#" 
-                className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 flex items-start gap-2"
-              >
-                <i className="bi bi-geo-alt text-[#f5f5f5] mt-1"></i>
+              </ContactLink>
+              <ContactLink href="#" icon="geo-alt" alignTop>
                 <span>4th Floor, Road No.36, Jubilee Hills, Hyderabad-500 033</span>
-              </Link>
+              </ContactLink>
             </div>
 
             {/* Social Links */}
-            <div className={`mb-6 transition-all duration-500 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+            <div className={`mb-6 ${visibilityClass('delay-300', 'scale')}`}>
               <div className="flex gap-4 pt-2">
-                <Link 
-                  href="#" 
-                  className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 text-lg"
-                  aria-label="Facebook"
-                >
-                  <i className="bi bi-facebook"></i>
-                </Link>
-                <Link 
-                  href="#" 
-                  className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 text-lg"
-                  aria-label="Instagram"
-                >
-                  <i className="bi bi-instagram"></i>
-                </Link>
-                <Link 
-                  href="#" 
-                  className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 text-lg"
-                  aria-label="LinkedIn"
-                >
-                  <i className="bi bi-linkedin"></i>
-                </Link>
-                <Link 
-                  href="#" 
-                  className="text-[#bfc6cf] hover:text-[#f5f5f5] transition-colors duration-200 text-lg"
-                  aria-label="YouTube"
-                >
-                  <i className="bi bi-youtube"></i>
-                </Link>
+                <SocialLink href="#" label="Facebook" icon="facebook" />
+                <SocialLink href="#" label="Instagram" icon="instagram" />
+                <SocialLink href="#" label="LinkedIn" icon="linkedin" />
+                <SocialLink href="#" label="YouTube" icon="youtube" />
               </div>
             </div>
 
             {/* Footer Bottom */}
-            <div className={`pt-3 text-xs lg:text-sm transition-all duration-500 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className={`pt-3 text-xs lg:text-sm ${visibilityClass('delay-400')}`}>
               <div className="flex flex-col gap-1">
                 <p className="text-[#bfc6cf]">
-                  Copyright © <span>{currentYear}</span> PAVANI MIRAI. All Rights Reserved.
+                  Copyright © <span>{CURRENT_YEAR}</span> PAVANI MIRAI. All Rights Reserved.
                 </p>
                 <Link 
                   href="https://www.wingmanbrandworks.com/" 
@@ -182,32 +240,13 @@ export default function Footer() {
         </div>
       </section>
 
-      {/* Back to Top Button */}
-      <button
-        onClick={scrollToTop}
-        className={`fixed right-5 bottom-5 w-14 h-14 rounded-full bg-white/3 flex items-center justify-center cursor-pointer z-50 transition-all duration-300 hover:bg-white/6 ${
-          showBackToTop ? 'opacity-95' : 'opacity-0 pointer-events-none'
-        }`}
-        aria-label="Scroll to top"
-      >
-        <svg 
-          className="w-11 h-11" 
-          viewBox="-1 -1 102 102"
-        >
-          <path
-            d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="6"
-            strokeLinecap="round"
-            style={{
-              strokeDasharray: `${pathLength} ${pathLength}`,
-              strokeDashoffset: pathLength * (1 - scrollProgress),
-              transition: 'stroke-dashoffset 150ms linear'
-            }}
-          />
-        </svg>
-      </button>
+      <BackToTopButton 
+        show={showBackToTop} 
+        progress={scrollProgress} 
+        onClick={scrollToTop} 
+      />
     </footer>
   );
 }
+
+export default memo(Footer);
