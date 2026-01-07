@@ -69,7 +69,7 @@ export default function SixthElement() {
       ref={sectionRef} 
       className="relative w-full overflow-hidden"
       style={{ 
-        backgroundColor: 'transparent', // Fully transparent container
+        backgroundColor: 'transparent',
         zIndex: 10, 
         position: 'relative' 
       }}
@@ -88,8 +88,8 @@ export default function SixthElement() {
       />
 
       {/* Text Overlay: Content linked to the scroller position */}
-      <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-13">
-        <div className="max-w-5xl px-6 text-center text-black">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="max-w-5xl px-6 text-center text-black" style={{ marginTop: '10%' }}>
           
           {/* Welcome Header: Appears between 15% and 35% of the scroll */}
           <h1 
