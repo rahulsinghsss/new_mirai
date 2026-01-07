@@ -13,40 +13,37 @@ import SixthElement from './Sixth_Element/Sixth_element'
 
 const Home = () => {
   return (
-    <div className="relative w-full overflow-x-hidden" style={{ backgroundColor: '#1a1a2e' }}>
-      {/* Fixed background layers (lowest z-index) */}
-      <ContactForm />  {/* z-index: 4 */}
-      <Hero />         {/* z-index: 5 */}
-      
-      {/* Scrollable content (higher z-index to cover fixed elements) */}
-      <div className="relative" style={{ zIndex: 10 }}>
+    <div className="relative bg-black w-full overflow-x-hidden">
+      <div className="relative z-10 bg-black">
+        <Hero />
+        
         {/* Spacer for Hero */}
         <div className="h-screen" aria-hidden="true" />
         
-        {/* SixthElement */}
-        <div className="relative bg-black">
+        {/* SixthElement - Using z-index 10 */}
+        <div className="relative" style={{ zIndex: 10 }}>
           <SixthElement />
         </div>
         
-        {/* RevealZoom */}
+        {/* RevealZoom - Using z-index 11 (next in line) */}
         <section 
           aria-label="Reveal zoom" 
           className="relative bg-black"
-          style={{ isolation: 'isolate' }}
+          style={{ zIndex: 11, isolation: 'isolate' }}
         >
           <RevealZoom />
         </section>
         
-        {/* Scroll video */}
+        {/* Following sections continue the ladder */}
         <section 
           aria-label="Scroll video" 
           className="relative bg-black"
+          style={{ zIndex: 12 }}
         >
           <Mirai_Grace />
         </section>
         
-        {/* Main content sections */}
-        <div className="relative bg-white">
+        <div style={{ position: 'relative', zIndex: 13 }}>
           <MiraiPodsIntro />
           <MiraiPodsSlider />
           <ClubhouseIntro />
@@ -55,13 +52,10 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Spacer to allow scrolling to reveal ContactForm */}
-      <div className="h-screen" style={{ backgroundColor: 'transparent' }} />
-      
-      {/* Footer */}
-      <div className="relative" style={{ zIndex: 15 }}>
-        <Footer />
-      </div>
+      {/* Fixed UI layers remain at the bottom/top of the stack */}
+      <ContactForm />
+      <div className="relative h-screen" style={{ zIndex: 0 }} />
+      <Footer />
     </div>
   )
 }
