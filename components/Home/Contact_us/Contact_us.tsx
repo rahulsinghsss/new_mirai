@@ -7,6 +7,7 @@ const dayViewPath = '/images/day_view.png';
 export default function ContactForm() {
   const [bgLoaded, setBgLoaded] = useState(false);
   const [bgError, setBgError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const img = new window.Image();
@@ -21,6 +22,27 @@ export default function ContactForm() {
       img.onerror = null;
     };
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const clientHeight = window.innerHeight;
+      
+      // Show contact form when user scrolls near the bottom (90% of page)
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+      setIsVisible(scrollPercentage > 0.9);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial position
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Don't render until visible
+  if (!isVisible) {
+    return null;
+  }
 
   // Render a neutral placeholder until background image is ready
   if (!bgLoaded) {
