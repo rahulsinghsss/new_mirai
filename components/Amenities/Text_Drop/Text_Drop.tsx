@@ -1,13 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useLayoutEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register plugin outside component to avoid re-registration
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { useEffect, useRef, useState } from 'react';
 
 const textDropLines = [
   { text: 'Indulgence', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80' },
@@ -16,125 +9,69 @@ const textDropLines = [
   { text: 'Your Element', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80' },
 ];
 
-// Use useLayoutEffect on client, useEffect on server
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
 export default function MiraiAmenitiesShowcase() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const textRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     const section = sectionRef.current;
-    const textContainer = textContainerRef.current;
-    if (!section || !textContainer) return;
+    if (!section) return;
 
-    // Clear any existing ScrollTriggers for this section
-    ScrollTrigger.getAll().forEach(st => {
-      if (st.trigger === section) {
-        st.kill();
-      }
-    });
+    const handleScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Start when section top reaches 60% of viewport
+      // End when section top reaches 10% of viewport
+      const startPoint = windowHeight * 0.6;
+      const endPoint = windowHeight * 0.1;
+      
+      // Calculate progress (0 to 1)
+      const totalDistance = startPoint - endPoint;
+      const currentPosition = startPoint - rect.top;
+      
+      let progress = currentPosition / totalDistance;
+      progress = Math.max(0, Math.min(1, progress)); // Clamp between 0 and 1
+      
+      setScrollProgress(progress);
+    };
 
-    // Create GSAP context for cleanup
-    const ctx = gsap.context(() => {
-      // Set initial states immediately and explicitly
-      textRefs.current.forEach((textEl, idx) => {
-        if (!textEl) return;
-        
-        // Kill any existing tweens on this element
-        gsap.killTweensOf(textEl);
-        
-        if (idx === 0) {
-          gsap.set(textEl, { 
-            rotateX: 0,
-            opacity: 1,
-            transformOrigin: 'center top',
-            clearProps: 'none' // Don't clear the props we just set
-          });
-        } else {
-          gsap.set(textEl, { 
-            rotateX: -90,
-            opacity: 0,
-            transformOrigin: 'center top',
-            clearProps: 'none'
-          });
-        }
-      });
-
-      imageRefs.current.forEach((imgEl) => {
-        if (!imgEl) return;
-        gsap.killTweensOf(imgEl);
-        gsap.set(imgEl, { scale: 0.8, opacity: 0 });
-      });
-
-      // Force a refresh to ensure proper calculation
-      ScrollTrigger.refresh();
-
-      // Text animation timeline
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 60%',
-          end: 'bottom 40%',
-          scrub: 1,
-          invalidateOnRefresh: true, // Recalculate on refresh
-        },
-      });
-
-      textRefs.current.forEach((textEl, idx) => {
-        if (!textEl || idx === 0) return;
-        
-        tl.to(
-          textEl,
-          {
-            rotateX: 0,
-            opacity: 1,
-            duration: 1,
-            ease: 'power2.out',
-          },
-          (idx - 1) * 0.25
-        );
-      });
-
-      // Images animation timeline
-      const tlImages = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 70%',
-          end: 'center center',
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      imageRefs.current.forEach((imgEl, idx) => {
-        if (!imgEl) return;
-        tlImages.to(
-          imgEl,
-          {
-            scale: 1,
-            opacity: 0.8,
-            duration: 1,
-            ease: 'power2.out',
-          },
-          idx * 0.15
-        );
-      });
-
-    }, section);
-
-    // Refresh ScrollTrigger after a short delay to ensure DOM is ready
-    const refreshTimeout = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
 
     return () => {
-      clearTimeout(refreshTimeout);
-      ctx.revert();
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Calculate individual element progress with stagger
+  const getTextProgress = (index: number) => {
+    if (index === 0) return 1; // First line always visible
+    
+    // Stagger each line - each starts after the previous is partially done
+    const staggerDelay = 0.15; // 15% delay between each line
+    const lineDuration = 0.4; // Each line takes 40% of total scroll to complete
+    
+    const lineStart = (index - 1) * staggerDelay;
+    const lineEnd = lineStart + lineDuration;
+    
+    const lineProgress = (scrollProgress - lineStart) / (lineEnd - lineStart);
+    return Math.max(0, Math.min(1, lineProgress));
+  };
+
+  const getImageProgress = (index: number) => {
+    const staggerDelay = 0.1;
+    const imageDuration = 0.5;
+    
+    const imageStart = index * staggerDelay;
+    const imageEnd = imageStart + imageDuration;
+    
+    const imageProgress = (scrollProgress - imageStart) / (imageEnd - imageStart);
+    return Math.max(0, Math.min(1, imageProgress));
+  };
+
+  // Easing function for smoother animation
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
   return (
     <section
@@ -142,93 +79,86 @@ export default function MiraiAmenitiesShowcase() {
       className="relative min-h-screen pb-48 md:pb-64 lg:pb-80 bg-white overflow-hidden"
       style={{ perspective: '1000px' }}
     >
-      {/* Background Images - Positioned behind text */}
+      {/* Background Images */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        {/* Top Left Image - At corner */}
+        {/* Top Left Image */}
         <div
-          ref={(el) => { imageRefs.current[0] = el; }}
           className="absolute top-4 left-4 md:top-6 md:left-6 lg:top-8 lg:left-8 w-[220px] h-[280px] sm:w-[280px] sm:h-[350px] lg:w-[350px] lg:h-[440px] rounded-lg overflow-hidden shadow-xl will-change-transform"
-          style={{ opacity: 0, transform: 'scale(0.8)' }} // CSS initial state as fallback
+          style={{
+            opacity: easeOutCubic(getImageProgress(0)) * 0.8,
+            transform: `scale(${0.8 + easeOutCubic(getImageProgress(0)) * 0.2})`,
+          }}
         >
-          <img
-            src={textDropLines[0].image}
-            alt={textDropLines[0].text}
-            className="w-full h-full object-cover"
-          />
+          <img src={textDropLines[0].image} alt={textDropLines[0].text} className="w-full h-full object-cover" />
         </div>
 
-        {/* Center Image - Behind text, moved slightly right */}
+        {/* Center Image */}
         <div
-          ref={(el) => { imageRefs.current[1] = el; }}
-          className="absolute top-[20%] left-[50%] -translate-x-1/2 w-[220px] h-[280px] sm:w-[280px] sm:h-[350px] lg:w-[350px] lg:h-[440px] rounded-lg overflow-hidden shadow-xl will-change-transform"
-          style={{ opacity: 0, transform: 'scale(0.8)' }}
+          className="absolute top-[20%] left-[50%] w-[220px] h-[280px] sm:w-[280px] sm:h-[350px] lg:w-[350px] lg:h-[440px] rounded-lg overflow-hidden shadow-xl will-change-transform"
+          style={{
+            opacity: easeOutCubic(getImageProgress(1)) * 0.8,
+            transform: `translateX(-50%) scale(${0.8 + easeOutCubic(getImageProgress(1)) * 0.2})`,
+          }}
         >
-          <img
-            src={textDropLines[1].image}
-            alt={textDropLines[1].text}
-            className="w-full h-full object-cover"
-          />
+          <img src={textDropLines[1].image} alt={textDropLines[1].text} className="w-full h-full object-cover" />
         </div>
 
-        {/* Third Image - Bottom Right Corner (moved slightly right) */}
+        {/* Bottom Right Image */}
         <div
-          ref={(el) => { imageRefs.current[2] = el; }}
           className="absolute bottom-4 right-[10%] md:bottom-6 md:right-[10%] lg:bottom-8 lg:right-[10%] w-[220px] h-[280px] sm:w-[280px] sm:h-[350px] lg:w-[350px] lg:h-[440px] rounded-lg overflow-hidden shadow-xl will-change-transform"
-          style={{ opacity: 0, transform: 'scale(0.8)' }}
+          style={{
+            opacity: easeOutCubic(getImageProgress(2)) * 0.8,
+            transform: `scale(${0.8 + easeOutCubic(getImageProgress(2)) * 0.2})`,
+          }}
         >
-          <img
-            src={textDropLines[2].image}
-            alt={textDropLines[2].text}
-            className="w-full h-full object-cover"
-          />
+          <img src={textDropLines[2].image} alt={textDropLines[2].text} className="w-full h-full object-cover" />
         </div>
 
-        {/* Fourth Image - Bottom Left Corner (moved slightly left) */}
+        {/* Bottom Left Image */}
         <div
-          ref={(el) => { imageRefs.current[3] = el; }}
           className="absolute bottom-4 left-[10%] md:bottom-6 md:left-[10%] lg:bottom-8 lg:left-[10%] w-[220px] h-[280px] sm:w-[280px] sm:h-[350px] lg:w-[350px] lg:h-[440px] rounded-lg overflow-hidden shadow-xl will-change-transform"
-          style={{ opacity: 0, transform: 'scale(0.8)' }}
+          style={{
+            opacity: easeOutCubic(getImageProgress(3)) * 0.8,
+            transform: `scale(${0.8 + easeOutCubic(getImageProgress(3)) * 0.2})`,
+          }}
         >
-          <img
-            src={textDropLines[3].image}
-            alt={textDropLines[3].text}
-            className="w-full h-full object-cover"
-          />
+          <img src={textDropLines[3].image} alt={textDropLines[3].text} className="w-full h-full object-cover" />
         </div>
       </div>
 
-      {/* Big Text - At the top */}
+      {/* Big Text */}
       <div 
-        ref={textContainerRef}
         className="relative z-10 flex flex-col items-center pt-4 md:pt-6 lg:pt-8 gap-6 md:gap-10 lg:gap-14"
         style={{ perspective: '1000px' }}
       >
-        {textDropLines.map((item, idx) => (
-          <div 
-            key={idx}
-            ref={(el) => { textRefs.current[idx] = el; }}
-            className="will-change-transform"
-            style={{ 
-              transformStyle: 'preserve-3d',
-              transformOrigin: 'center top',
-              // CSS initial states as fallback before JS runs
-              opacity: idx === 0 ? 1 : 0,
-              transform: idx === 0 ? 'rotateX(0deg)' : 'rotateX(-90deg)',
-            }}
-          >
-            <div
-              className="text-[clamp(3.5rem,10vw,8rem)] font-light tracking-[-0.02em] text-[#6B2C3E] leading-[1.1] text-center whitespace-nowrap"
-              style={{
-                fontFamily: '"Playfair Display", Georgia, serif',
+        {textDropLines.map((item, idx) => {
+          const progress = getTextProgress(idx);
+          const easedProgress = easeOutCubic(progress);
+          
+          return (
+            <div 
+              key={idx}
+              className="will-change-transform"
+              style={{ 
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'center top',
+                opacity: idx === 0 ? 1 : easedProgress,
+                transform: idx === 0 
+                  ? 'rotateX(0deg)' 
+                  : `rotateX(${-90 + easedProgress * 90}deg)`,
               }}
             >
-              {item.text}
+              <div
+                className="text-[clamp(3.5rem,10vw,8rem)] font-light tracking-[-0.02em] text-[#6B2C3E] leading-[1.1] text-center whitespace-nowrap"
+                style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+              >
+                {item.text}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Font import */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500&display=swap');
       `}</style>
