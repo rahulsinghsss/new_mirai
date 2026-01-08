@@ -41,30 +41,23 @@ const ContactForm = memo(function ContactForm() {
           </h2>
 
           {/* Form */}
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+          <form onSubmit={(e) => e.preventDefault()}>
             {/* Name Input */}
-            <div className="border-b border-gray-300">
+            <div className="border-b border-gray-300 mb-6">
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full bg-transparent py-4 outline-none placeholder-opacity-100"
+                className="w-full bg-transparent py-4 outline-none"
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   color: '#722F37',
                   fontSize: '1rem',
                 }}
               />
-              <style jsx>{`
-                input::placeholder {
-                  color: #722F37;
-                  opacity: 1;
-                  font-family: Georgia, "Times New Roman", serif;
-                }
-              `}</style>
             </div>
 
             {/* Email Input */}
-            <div className="border-b border-gray-300">
+            <div className="border-b border-gray-300 mb-6">
               <input
                 type="email"
                 placeholder="Email"
@@ -78,7 +71,7 @@ const ContactForm = memo(function ContactForm() {
             </div>
 
             {/* Number Input */}
-            <div className="border-b border-gray-300">
+            <div className="border-b border-gray-300 mb-6">
               <input
                 type="tel"
                 placeholder="Number"
@@ -92,11 +85,11 @@ const ContactForm = memo(function ContactForm() {
             </div>
 
             {/* Terms Checkbox */}
-            <div className="flex items-center gap-3 pt-4">
+            <div className="flex items-center gap-3 mb-6">
               <input
                 type="checkbox"
                 id="terms"
-                className="w-4 h-4 border-2 border-gray-400 rounded-sm accent-[#722F37] cursor-pointer"
+                className="w-4 h-4 border-2 border-gray-400 rounded-sm cursor-pointer"
                 style={{
                   accentColor: '#722F37',
                 }}
@@ -117,7 +110,7 @@ const ContactForm = memo(function ContactForm() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-5 rounded-xl mt-6 transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+              className="w-full py-5 rounded-xl transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
               style={{
                 background: '#722F37',
                 fontFamily: 'Georgia, "Times New Roman", serif',
@@ -131,6 +124,14 @@ const ContactForm = memo(function ContactForm() {
           </form>
         </div>
       </div>
+
+      <style jsx global>{`
+        input::placeholder {
+          color: #722F37 !important;
+          opacity: 1 !important;
+          font-family: Georgia, "Times New Roman", serif !important;
+        }
+      `}</style>
     </div>
   );
 });
