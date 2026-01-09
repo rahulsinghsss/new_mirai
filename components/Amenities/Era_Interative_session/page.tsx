@@ -124,7 +124,7 @@ const EraSeasons: React.FC = () => {
   const backgroundImages: { [key: string]: string } = {
     'bg-spring': 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods/infinitypool.png',
     'bg-summer': 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods/aviapod.png',
-    'bg-autumn': 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods/terrakidsplay.png',
+    'bg-autumn': 'https://d3p1hokpi6aqc3.cloudfront.net/Aminites_Tera_Pods_1.png',
     'bg-winter': 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods/pyro_pod.png',
     'bg-terra-pool': 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/infinitypool.jpg',
     'bg-terra-vantage': 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/vantagepoint.jpg',
