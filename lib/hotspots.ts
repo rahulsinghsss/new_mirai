@@ -22,7 +22,7 @@ export const defaultHotspots: HotspotData[] = [
   { id: 'hp-gaudium', pitch: -1, yaw: 410, title: 'The Gaudium School', distance: '5 Mins', icon: 'school' },
   { id: 'hp-anvaya', pitch: -14, yaw: 295, title: 'Anvaya Convention', distance: '5 Mins', icon: 'convention' },
   { id: 'hp-pradhan', pitch: -14, yaw: 240, title: 'Pradhan Convention', distance: '5 Mins', icon: 'convention' },
-  { id: 'hp-cognizant', pitch: -13, yaw: 370, title: 'Cognizant', distance: '5 Mins', icon: 'tech' },
+  { id: 'hp-cognizant', pitch: -15, yaw: 360, title: 'Cognizant', distance: '5 Mins', icon: 'tech' },
   { id: 'hp-capgemini', pitch: -13, yaw: 400, title: 'Capgemini', distance: '5 Mins', icon: 'tech' },
   { id: 'hp-amazon', pitch: -2, yaw: 35, title: 'Amazon Hyderabad Campus', distance: '5 Mins', icon: 'tech' },
   { id: 'hp-waverock', pitch: -2, yaw: 65, title: 'WaveRock SEZ', distance: '5 Mins', icon: 'tech' },
@@ -34,7 +34,7 @@ export const defaultHotspots: HotspotData[] = [
   { id: 'hp-google', pitch: 0, yaw: 415, title: 'Google', distance: '10 Mins', icon: 'tech' },
   { id: 'hp-iiit', pitch: 1, yaw: 375, title: 'IIIT Hyderabad', distance: '10 Mins', icon: 'university' },
   { id: 'hp-cbit', pitch: -3, yaw: 210, title: 'CBIT', distance: '10 Mins', icon: 'university' },
-  { id: 'hp-hcu', pitch: -2, yaw: 320, title: 'Hyderabad Central University', distance: '10 Mins', icon: 'university' },
+  { id: 'hp-hcu', pitch: 1, yaw: 322, title: 'Hyderabad Central University', distance: '10 Mins', icon: 'university' },
   { id: 'hp-airport', pitch: 2, yaw: 145, title: 'Airport', distance: '30 Mins', icon: 'airport' },
 ];
 
