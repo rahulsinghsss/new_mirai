@@ -76,10 +76,10 @@ const Home = () => {
 
   return (
     <>
-      {/* Hero is fixed position with video - z-index 1 */}
+      {/* Hero is fixed position with video - z-index 2 */}
       <Hero />
       
-      {/* ContactForm is fixed - z-index 2, but only visible near the end (controlled internally) */}
+      {/* ContactForm is fixed - z-index 1, only shows when scrolled past 80% */}
       <ContactForm />
       
       {/* Main scrollable content */}
@@ -89,13 +89,18 @@ const Home = () => {
         
         {/* Content sections - z-index 10, scrolls over Hero */}
         <div className="relative" style={{ zIndex: 10 }}>
-          {/* SixthElement - visible right after Hero video */}
+          {/* SixthElement - transparent background, shows Hero video behind */}
           <SixthElement />
           
+          {/* RevealZoom - negative margin to overlap any white area from SixthElement */}
           <section 
             aria-label="Reveal zoom" 
             className="relative bg-black"
-            style={{ isolation: 'isolate' }}
+            style={{ 
+              isolation: 'isolate',
+              marginTop: '-100px',
+              paddingTop: '100px'
+            }}
           >
             <RevealZoom />
           </section>
