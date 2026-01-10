@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
 import NavContainer from "@/components/Home/Navbar/NavContainer";
 import LoadingOverlay from '@/components/Common/LoadingOverlay';
 import SafeDomPatches from '@/components/Common/SafeDomPatches';
@@ -20,8 +19,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ backgroundColor: '#000' }}>
       <head>
+        {/* CRITICAL: Black background before anything else loads */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              html, body {
+                background-color: #000 !important;
+                background: #000 !important;
+              }
+            `,
+          }}
+        />
+        
         {/* CRITICAL: Reset scroll position before anything else loads */}
         <script
           dangerouslySetInnerHTML={{
@@ -49,7 +60,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" style={{ backgroundColor: '#000' }}>
         {/* Server-rendered black overlay to show immediately during initial load */}
         <div 
           id="initial-loading-overlay" 
