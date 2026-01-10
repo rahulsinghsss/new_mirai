@@ -69,7 +69,7 @@ export default function SixthElement() {
       ref={sectionRef} 
       className="relative w-full overflow-hidden"
       style={{ 
-        backgroundColor: 'transparent', // Fully transparent container
+        backgroundColor: 'transparent',
         zIndex: 10, 
         position: 'relative' 
       }}
@@ -88,12 +88,12 @@ export default function SixthElement() {
       />
 
       {/* Text Overlay: Content linked to the scroller position */}
-      <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-13">
-        <div className="max-w-5xl px-6 text-center text-black">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="max-w-5xl px-6 text-center text-black" style={{ marginTop: '10%' }}>
           
           {/* Welcome Header: Appears between 15% and 35% of the scroll */}
           <h1 
-            className="uppercase tracking-[0.3em] mb-2 md:mb-4 text-black"
+            className="tracking-[0.3em] mb-1 md:mb-2 text-black"
             style={h1Style}
           >
             Welcome to Pavani Mirai
@@ -110,22 +110,22 @@ export default function SixthElement() {
           <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
             {/* Paragraph 1: Appears between 35% and 55% of the scroll */}
             <p 
-              className="leading-relaxed font-normal text-black"
-              style={{ ...getScrollStyle(0.35, 0.55), fontSize: '20px' }}
+              className="leading-relaxed text-black"
+              style={{ ...getScrollStyle(0.35, 0.55), fontSize: '20px', fontWeight: 400 }}
             >
-              Nature crafted five elements — <span className="font-bold">Earth</span> that grounds us. 
-              <span className="font-bold"> Water</span> that nourishes us. 
-              <span className="font-bold"> Fire</span> that warms us. 
-              <span className="font-bold"> Air</span> that breathes through us. 
-              <span className="font-bold"> Space</span> that holds us.
+              Nature crafted five elements — Earth that grounds us. 
+              Water that nourishes us. 
+              Fire that warms us. 
+              Air that breathes through us. 
+              Space that holds us.
             </p>
             
             {/* Paragraph 2: Appears between 45% and 65% of the scroll */}
             <p 
-              className="hidden md:block leading-relaxed font-normal text-black"
-              style={{ ...getScrollStyle(0.45, 0.65), fontSize: '20px' }}
+              className="hidden md:block leading-relaxed text-black"
+              style={{ ...getScrollStyle(0.45, 0.65), fontSize: '20px', fontWeight: 400 }}
             >
-              With Pavani as the catalyst, the <span className="italic font-medium">sixth element</span> takes shape when all the elements are brought together in serene harmony. 
+              With Pavani as the catalyst, the sixth element takes shape when all the elements are brought together in serene harmony. 
               This is how Mirai was birthed — to give meaning to all of these elements and to harness their full potential.
             </p>
           </div>
