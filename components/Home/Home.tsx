@@ -16,121 +16,110 @@ import SixthElement from './Sixth_Element/Sixth_element'
 
 const Home = () => {
   const [isPreloaderComplete, setIsPreloaderComplete] = useState(false);
-  const [isPageFullyLoaded, setIsPageFullyLoaded] = useState(false);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const [isPageReady, setIsPageReady] = useState(false);
 
   useEffect(() => {
-    // Check if preloader was already shown
+    // Check if preloader was already shown in this session
     const hasSeenPreloader = sessionStorage.getItem('preloaderShown');
     
     if (hasSeenPreloader) {
       setIsPreloaderComplete(true);
     }
+    setHasCheckedSession(true);
+  }, []);
 
-    // Disable scrolling initially
+  // Disable scrolling until page is ready
+  useEffect(() => {
+    if (!isPreloaderComplete) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      return;
+    }
+
     document.body.style.overflow = 'hidden';
-    document.body.style.height = '100vh';
     document.documentElement.style.overflow = 'hidden';
-    document.documentElement.style.height = '100vh';
 
-    // Wait for all resources to load
-    const handleLoad = () => {
-      // Add a small delay to ensure everything is rendered
+    const enableScroll = () => {
       setTimeout(() => {
-        setIsPageFullyLoaded(true);
-        // Re-enable scrolling
         document.body.style.overflow = '';
-        document.body.style.height = '';
         document.documentElement.style.overflow = '';
-        document.documentElement.style.height = '';
-      }, 500);
+        setIsPageReady(true);
+      }, 800);
     };
 
     if (document.readyState === 'complete') {
-      handleLoad();
+      enableScroll();
     } else {
-      window.addEventListener('load', handleLoad);
+      window.addEventListener('load', enableScroll);
+      return () => window.removeEventListener('load', enableScroll);
     }
 
     return () => {
-      window.removeEventListener('load', handleLoad);
-      // Cleanup: re-enable scrolling when component unmounts
       document.body.style.overflow = '';
-      document.body.style.height = '';
       document.documentElement.style.overflow = '';
-      document.documentElement.style.height = '';
     };
-  }, []);
+  }, [isPreloaderComplete]);
 
   const handlePreloaderComplete = () => {
+    sessionStorage.setItem('preloaderShown', 'true');
     setIsPreloaderComplete(true);
   };
 
+  if (!hasCheckedSession) {
+    return null;
+  }
+
+  if (!isPreloaderComplete) {
+    return <VideoPreloader onComplete={handlePreloaderComplete} />;
+  }
+
   return (
     <>
-      {/* Video Preloader - highest z-index */}
-      {!isPreloaderComplete && <VideoPreloader onComplete={handlePreloaderComplete} />}
+      {/* Hero is fixed position with video - z-index 1 */}
+      <Hero />
       
-      {/* Hero is fixed position and needs to be rendered outside the main content wrapper
-          so it's immediately visible after preloader completes */}
-      {isPreloaderComplete && <Hero />}
+      {/* ContactForm is fixed - z-index 2 (above Hero, below scrolling content) */}
+      <ContactForm />
       
-      <div 
-        className="relative bg-black w-full overflow-x-hidden"
-        style={{
-          minHeight: '100vh',
-          visibility: isPreloaderComplete ? 'visible' : 'hidden',
-          opacity: isPreloaderComplete ? 1 : 0,
-          transition: 'opacity 0.5s ease-in'
-        }}
-      >
-        <div className="relative z-10 bg-black">
-          {/* Spacer for Hero - keeps space for the fixed Hero */}
+      {/* Main scrollable content */}
+      <div className="relative w-full overflow-x-hidden">
+        {/* Spacer for Hero section */}
+        <div className="h-screen" aria-hidden="true" />
+        
+        {/* Content sections - z-index 10, scrolls over Hero */}
+        <div className="relative" style={{ zIndex: 10 }}>
+          <SixthElement />
+          
+          <section 
+            aria-label="Reveal zoom" 
+            className="relative bg-black"
+            style={{ isolation: 'isolate' }}
+          >
+            <RevealZoom />
+          </section>
+          
+          <section 
+            aria-label="Scroll video" 
+            className="relative bg-black"
+          >
+            <Mirai_Grace />
+          </section>
+          
+          <div className="relative bg-black">
+            <MiraiPodsIntro />
+            <MiraiPodsSlider />
+            <ClubhouseIntro />
+            <MiraiClubhouse />
+            <InteractiveMap />
+          </div>
+
+          {/* Spacer to reveal fixed ContactForm behind */}
           <div className="h-screen" aria-hidden="true" />
           
-          {/* Rest of content - hidden until page fully loads */}
-          <div
-            style={{
-              opacity: isPageFullyLoaded ? 1 : 0,
-              transition: 'opacity 0.8s ease-in',
-              pointerEvents: isPageFullyLoaded ? 'auto' : 'none'
-            }}
-          >
-            {/* SixthElement - Using z-index 10 */}
-            <div className="relative" style={{ zIndex: 10 }}>
-              <SixthElement />
-            </div>
-            
-            {/* RevealZoom - Using z-index 11 (next in line) */}
-            <section 
-              aria-label="Reveal zoom" 
-              className="relative bg-black"
-              style={{ zIndex: 11, isolation: 'isolate' }}
-            >
-              <RevealZoom />
-            </section>
-            
-            {/* Following sections continue the ladder */}
-            <section 
-              aria-label="Scroll video" 
-              className="relative bg-black"
-              style={{ zIndex: 12 }}
-            >
-              <Mirai_Grace />
-            </section>
-            
-            <div style={{ position: 'relative', zIndex: 13 }}>
-              <MiraiPodsIntro />
-              <MiraiPodsSlider />
-              <ClubhouseIntro />
-              <MiraiClubhouse />
-              <InteractiveMap />
-            </div>
-          </div>
+          {/* Footer scrolls over ContactForm */}
+          <Footer />
         </div>
-        {/* Fixed UI layers remain at the bottom/top of the stack */}
-        <ContactForm />
-        <div className="relative h-screen" style={{ zIndex: 0 }} />
-        <Footer />
       </div>
     </>
   )
