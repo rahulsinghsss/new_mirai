@@ -66,7 +66,7 @@ export default function MiraiAmenities() {
     marginInline: 0,
     display: 'block',
     fontSize: '64px',
-    fontWeight: 500,
+    fontWeight: 100,
     fontFamily: 'Migra, serif',
     color: '#78252f'
   };
@@ -76,14 +76,16 @@ export default function MiraiAmenities() {
     lineHeight: '1.4',
     fontWeight: 300,
     fontStyle: 'normal',
-    fontFamily: '"Century Gothic", sans-serif',
+    fontFamily: "Century, 'Century Gothic', Arial, sans-serif",
     display: 'block',
     marginBlockStart: '1em',
     marginBlockEnd: '1em',
     marginInlineStart: '0px',
     marginInlineEnd: '0px',
     unicodeBidi: 'isolate',
-    color: '#333333'
+    color: '#333333',
+    textRendering: 'optimizeLegibility',
+    WebkitFontSmoothing: 'antialiased'
   };
 
   return (
