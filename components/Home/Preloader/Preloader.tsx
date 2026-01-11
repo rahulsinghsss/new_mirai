@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
-
 interface VideoPreloaderProps {
   onComplete?: () => void;
 }
-
 export default function VideoPreloader({ onComplete }: VideoPreloaderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
-
   useEffect(() => {
     // Check if preloader has been shown in this session
     const hasSeenPreloader = sessionStorage.getItem('preloaderShown');
@@ -17,7 +14,6 @@ export default function VideoPreloader({ onComplete }: VideoPreloaderProps) {
       onComplete?.();
     }
   }, [onComplete]);
-
   const handleVideoEnd = () => {
     // Start fade out animation
     setFadeOut(true);
@@ -29,15 +25,12 @@ export default function VideoPreloader({ onComplete }: VideoPreloaderProps) {
       onComplete?.();
     }, 500);
   };
-
   const handleSkip = () => {
     handleVideoEnd();
   };
-
   if (!isLoading) {
     return null;
   }
-
   return (
     <>
       <div 
@@ -73,7 +66,6 @@ export default function VideoPreloader({ onComplete }: VideoPreloaderProps) {
           />
           Your browser does not support the video tag.
         </video>
-
         {/* Skip Button */}
         <button
           onClick={handleSkip}
@@ -106,7 +98,6 @@ export default function VideoPreloader({ onComplete }: VideoPreloaderProps) {
         >
           Skip →
         </button>
-
         {/* Loading indicator (optional) */}
         <div
           style={{

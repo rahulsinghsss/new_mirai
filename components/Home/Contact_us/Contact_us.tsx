@@ -7,6 +7,7 @@ const dayViewPath = '/images/day_view.png';
 export default function ContactForm() {
   const [bgError, setBgError] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
     // Load Migra font from Fontshare
@@ -20,21 +21,46 @@ export default function ContactForm() {
       setBgError(true);
     };
     img.src = dayViewPath;
+
+    // Only show ContactForm when scrolled past 80% of the page
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const maxScroll = docHeight - windowHeight;
+      
+      // Calculate scroll percentage (0 to 1)
+      const scrollPercent = maxScroll > 0 ? scrollY / maxScroll : 0;
+      
+      // Only show when scrolled past 80% of the page
+      setShouldShow(scrollPercent > 0.8);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
     return () => {
       img.onerror = null;
       document.head.removeChild(link);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Don't render at all if not scrolled far enough
+  if (!shouldShow) {
+    return null;
+  }
 
   const formContent = (
     <div 
       className="w-auto rounded-2xl p-8 md:p-10 border border-white/30"
       style={{ 
-        maxWidth: '340px',
+        maxWidth: '400px',
         background: 'rgba(255, 255, 255, 0.25)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)'
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)',
+        fontFamily: '"Migra", Georgia, serif'
       }}
     >
       <h2 
@@ -94,7 +120,7 @@ export default function ContactForm() {
     <section
       id="contact-section"
       className="fixed inset-0 w-full h-screen flex items-center justify-start overflow-hidden"
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 1 }}
     >
       {/* Background Image */}
       <div className="absolute inset-0">
