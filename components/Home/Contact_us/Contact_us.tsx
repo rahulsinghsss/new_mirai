@@ -59,7 +59,8 @@ export default function ContactForm() {
         background: 'rgba(255, 255, 255, 0.25)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)'
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)',
+        fontFamily: '"Migra", Georgia, serif'
       }}
     >
       <h2 
