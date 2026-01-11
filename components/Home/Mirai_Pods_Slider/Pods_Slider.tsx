@@ -347,7 +347,7 @@ export default function MiraiPodsSlider() {
               </p>
               <h2
                 style={{
-                  fontSize: '40px',
+                  fontSize: '44px',
                   fontWeight: 300,
                   lineHeight: 1.15,
                   whiteSpace: 'pre-line',
