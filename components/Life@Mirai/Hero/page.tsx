@@ -258,7 +258,7 @@ export default function MiraiHomesPage() {
         </section>
 
         {/* ==================== BLOG ITEMS SECTION ==================== */}
-        <section className="py-12 lg:py-20 bg-gradient-to-b from-slate-50 to-white">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
             <div className="space-y-16 lg:space-y-24">
               {blogPosts.map((post, index) => (
