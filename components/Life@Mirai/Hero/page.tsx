@@ -56,7 +56,6 @@ export default function MiraiHomesPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const mainRef = useRef<HTMLElement>(null);
-  const scrollDistRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const blogRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressPathRef = useRef<SVGPathElement>(null);
@@ -65,18 +64,21 @@ export default function MiraiHomesPage() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Smooth parallax animation for clouds and sky
-      gsap.timeline({
+      const parallaxTimeline = gsap.timeline({
         scrollTrigger: {
-          trigger: scrollDistRef.current,
-          start: "0 0",
-          end: "100% 100%",
-          scrub: 1,
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.5,
+          markers: false,
         },
-      })
-        .fromTo(".sky", { y: 0 }, { y: -200 }, 0)
-        .fromTo(".cloud1", { y: 100 }, { y: -800 }, 0)
-        .fromTo(".cloud2", { y: -150 }, { y: -500 }, 0)
-        .fromTo(".cloud3", { y: -50 }, { y: -650 }, 0);
+      });
+
+      parallaxTimeline
+        .to(".sky", { y: -200, ease: "none" }, 0)
+        .to(".cloud2", { y: -500, ease: "none" }, 0)
+        .to(".cloud1", { y: -800, ease: "none" }, 0)
+        .to(".cloud3", { y: -650, ease: "none" }, 0);
 
       // Blog card reveal animations
       blogRefs.current.forEach((container, index) => {
@@ -187,6 +189,7 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 preserveAspectRatio="xMidYMid slice"
+                style={{ transformOrigin: 'center center' }}
               />
 
               {/* Cloud Layers - visible layers */}
@@ -198,6 +201,7 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="0.9"
+                style={{ transformOrigin: 'center center' }}
               />
               <image
                 className="cloud1"
@@ -207,6 +211,7 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="0.95"
+                style={{ transformOrigin: 'center center' }}
               />
               <image
                 className="cloud3"
@@ -216,6 +221,7 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="1"
+                style={{ transformOrigin: 'center center' }}
               />
 
               {/* White Mask at Bottom */}
