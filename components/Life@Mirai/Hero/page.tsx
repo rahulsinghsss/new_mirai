@@ -296,7 +296,6 @@ export default function MiraiHomesPage() {
           aria-label="Scroll to top"
         >
           <svg
-            ref={progressPathRef}
             className="absolute inset-0 w-full h-full -rotate-90"
             viewBox="0 0 64 64"
           >
@@ -309,6 +308,7 @@ export default function MiraiHomesPage() {
               strokeWidth="3"
             />
             <circle
+              ref={progressPathRef}
               cx="32"
               cy="32"
               r="28"
