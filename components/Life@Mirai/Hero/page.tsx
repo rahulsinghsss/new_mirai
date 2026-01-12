@@ -307,14 +307,14 @@ export default function MiraiHomesPage() {
                           <p className="text-slate-600 leading-relaxed text-base lg:text-lg">
                             {post.excerpt}
                           </p>
-                          <div className="pt-4 text-right">
+                          <div className="pt-8 text-right">
                             <Link
                               href={post.href}
                               className="inline-flex items-center justify-center transition-all duration-300 group"
                               style={{ color: '#78252f' }}
                             >
                               <svg
-                                className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                                className="w-8 h-8 transform group-hover:translate-x-1 transition-transform duration-300"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -342,13 +342,13 @@ export default function MiraiHomesPage() {
                           <p className="text-slate-600 leading-relaxed text-base lg:text-lg">
                             {post.excerpt}
                           </p>
-                          <div className="pt-4 text-right">
+                          <div className="pt-8 text-right">
                             <Link
                               href={post.href}
                               className="inline-flex items-center justify-center text-amber-600 transition-all duration-300 group"
                             >
                               <svg
-                                className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                                className="w-8 h-8 transform group-hover:translate-x-1 transition-transform duration-300"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
