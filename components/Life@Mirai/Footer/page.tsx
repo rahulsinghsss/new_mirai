@@ -165,14 +165,15 @@ function Footer() {
       aria-label="Footer - Pavani Mirai"
     >
       {/* Background Image */}
-      <Image
-        src="https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.png"
-        alt="Footer background"
-        fill
-        className="object-cover"
-        style={{ objectPosition: 'right bottom' }}
-        priority
-      />
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Image
+          src="https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.png"
+          alt="Footer background"
+          fill
+          className="object-cover scale-110 translate-x-[10%] translate-y-[10%]"
+          priority
+        />
+      </div>
       <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
 
       <div 
