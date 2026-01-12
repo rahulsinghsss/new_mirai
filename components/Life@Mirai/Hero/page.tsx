@@ -54,56 +54,55 @@ export default function MiraiHomesPage() {
   const [showHeadText, setShowHeadText] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const mainRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const blogRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressPathRef = useRef<SVGPathElement>(null);
 
-  // Wait for component to be ready
+  // Handle mounting and scroll position
   useEffect(() => {
-    // Prevent any scroll restoration
+    // Prevent scroll restoration
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
     
-    // Force scroll to top immediately
+    // Set scroll to top
     window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
+    // Mark as mounted after a brief delay
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setMounted(true);
+      });
+    });
   }, []);
 
   // GSAP Parallax and reveal animations
   useEffect(() => {
-    if (!isReady) return;
+    if (!mounted) return;
 
     const ctx = gsap.context(() => {
-      // Kill any existing ScrollTriggers
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      // Parallax for each cloud layer - using separate ScrollTriggers
+      const clouds = [
+        { selector: ".sky", distance: -200 },
+        { selector: ".cloud2", distance: -500 },
+        { selector: ".cloud1", distance: -800 },
+        { selector: ".cloud3", distance: -650 },
+      ];
 
-      // Smooth parallax animation for clouds and sky
-      gsap.utils.toArray([".sky", ".cloud1", ".cloud2", ".cloud3"]).forEach((el) => {
-        const yValue = 
-          (el as Element).classList.contains("sky") ? -200 :
-          (el as Element).classList.contains("cloud2") ? -500 :
-          (el as Element).classList.contains("cloud1") ? -800 : -650;
+      clouds.forEach(({ selector, distance }) => {
+        const element = document.querySelector(selector);
+        if (!element) return;
 
-        gsap.to(el as Element, {
-          y: yValue,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1.5,
-            immediateRender: false,
+        ScrollTrigger.create({
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          onUpdate: (self) => {
+            const progress = self.progress;
+            gsap.set(element, { y: progress * distance });
           },
         });
       });
@@ -136,12 +135,11 @@ export default function MiraiHomesPage() {
         );
       });
 
-      // Refresh ScrollTrigger
       ScrollTrigger.refresh();
     }, mainRef);
 
     return () => ctx.revert();
-  }, [isReady]);
+  }, [mounted]);
 
   // Scroll event handlers
   useEffect(() => {
@@ -177,10 +175,10 @@ export default function MiraiHomesPage() {
 
   return (
     <>
-      <main ref={mainRef} className="bg-white">
+      <main ref={mainRef} className="bg-white" style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.3s' }}>
         {/* ==================== PARALLAX HERO SECTION ==================== */}
         <section ref={heroRef} className="relative h-screen overflow-hidden bg-gradient-to-b from-blue-400 to-blue-200">
-          {/* SVG Parallax Container - positioned to fill the hero section */}
+          {/* SVG Parallax Container */}
           <div className="absolute inset-0 w-full h-full z-0">
             <svg 
               viewBox="0 0 1200 800" 
@@ -203,7 +201,7 @@ export default function MiraiHomesPage() {
                 </mask>
               </defs>
 
-              {/* Sky Background - visible layer */}
+              {/* Sky Background */}
               <image
                 className="sky"
                 xlinkHref="https://azure-baboon-302476.hostingersite.com//mirai_/media/footer_img.png"
@@ -214,7 +212,7 @@ export default function MiraiHomesPage() {
                 preserveAspectRatio="xMidYMid slice"
               />
 
-              {/* Cloud Layers - visible layers */}
+              {/* Cloud Layers */}
               <image
                 className="cloud2"
                 xlinkHref="https://assets.codepen.io/721952/cloud2.png"
