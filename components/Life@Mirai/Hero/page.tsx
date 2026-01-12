@@ -70,7 +70,6 @@ export default function MiraiHomesPage() {
           start: "top top",
           end: "bottom top",
           scrub: 0.8, // Smoother scrub
-          ease: "none",
         },
       });
 
