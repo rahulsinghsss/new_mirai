@@ -1,3 +1,17 @@
+To make the cloud parallax **smooth**, the best approach is to replace the manual `window.addEventListener('scroll')` calculation with **GSAP's `ScrollTrigger**`.
+
+Currently, your code calculates position strictly on every scroll pixel, which can feel jittery. GSAP's `scrub` feature adds interpolation (lag), giving the movement a "weighty," smooth, and fluid feel.
+
+Here is the optimized, fully integrated code.
+
+### Key Changes Made:
+
+1. **Removed** the manual `window.addEventListener` scroll logic.
+2. **Added** a `gsap.timeline` for the Hero section.
+3. **Enabled `scrub: 1.5**`: This is the secret sauce. It tells the animation to take 1.5 seconds to catch up to the scrollbar, creating that buttery smooth effect.
+4. **Consolidated** all animations into a single `gsap.context` for better performance and React cleanup.
+
+```tsx
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -63,48 +77,32 @@ export default function MiraiHomesPage() {
   const blogRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressPathRef = useRef<SVGPathElement>(null);
 
-  // Cloud parallax using useLayoutEffect to prevent jump on refresh
-  useIsomorphicLayoutEffect(() => {
-    const handleParallax = () => {
-      if (!heroRef.current) return;
-      
-      const heroRect = heroRef.current.getBoundingClientRect();
-      const heroHeight = heroRef.current.offsetHeight;
-      
-      // Calculate progress relative to the hero section
-      const scrolled = -heroRect.top;
-      
-      // Ensure we don't calculate if we are way past the section (optimization)
-      // but allow negative top to ensure smooth exit
-      const progress = Math.max(0, Math.min(1, scrolled / heroHeight));
-      
-      // Select elements
-      const sky = document.querySelector('.sky') as SVGImageElement;
-      const cloud1 = document.querySelector('.cloud1') as SVGImageElement;
-      const cloud2 = document.querySelector('.cloud2') as SVGImageElement;
-      const cloud3 = document.querySelector('.cloud3') as SVGImageElement;
-      
-      // Apply transforms
-      if (sky) sky.style.transform = `translate3d(0, ${progress * -200}px, 0)`;
-      if (cloud1) cloud1.style.transform = `translate3d(0, ${progress * -800}px, 0)`;
-      if (cloud2) cloud2.style.transform = `translate3d(0, ${progress * -500}px, 0)`;
-      if (cloud3) cloud3.style.transform = `translate3d(0, ${progress * -650}px, 0)`;
-    };
-
-    window.addEventListener('scroll', handleParallax, { passive: true });
-    
-    // Force immediate calculation before paint
-    handleParallax();
-    
-    return () => window.removeEventListener('scroll', handleParallax);
-  }, []);
-
-  // GSAP for blog card animations only
+  // Consolidated GSAP Logic (Cloud Parallax + Blog Animations)
   useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Refresh ScrollTrigger to ensure positions are correct after load
       ScrollTrigger.refresh();
 
+      // --- 1. SMOOTH CLOUD PARALLAX ---
+      // We create a timeline that is scrubbed by the scroll
+      const parallaxTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top", // Ends when the 200vh section leaves view
+          scrub: 1.5, // THE KEY: Adds a 1.5 second 'lag' smoothing to the movement
+        },
+        defaults: { ease: "none" } // Linear movement, let scrubbing handle the easing
+      });
+
+      // Add animations to timeline (values match your original math)
+      parallaxTl
+        .to(".sky", { y: -200 }, 0)
+        .to(".cloud1", { y: -800 }, 0)
+        .to(".cloud2", { y: -500 }, 0)
+        .to(".cloud3", { y: -650 }, 0);
+
+
+      // --- 2. BLOG CARD ANIMATIONS ---
       blogRefs.current.forEach((container, index) => {
         if (!container) return;
 
@@ -136,7 +134,8 @@ export default function MiraiHomesPage() {
     return () => ctx.revert();
   }, []);
 
-  // Scroll event handlers (Navbar/Top button logic)
+  // Standard Scroll event handlers (For UI State: Navbar/Top button/Text fade)
+  // We keep this lightweight for state toggles, but left the heavy animation to GSAP
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -149,7 +148,6 @@ export default function MiraiHomesPage() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Initial check
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -195,13 +193,13 @@ export default function MiraiHomesPage() {
                 </linearGradient>
               </defs>
 
+              {/* Note: Removed inline styles for transform/will-change as GSAP handles them now */}
               <image
                 className="sky"
                 xlinkHref="https://azure-baboon-302476.hostingersite.com//mirai_/media/footer_img.png"
                 width="1200"
                 height="800"
                 preserveAspectRatio="xMidYMid slice"
-                style={{ willChange: 'transform' }}
               />
 
               <image
@@ -209,21 +207,18 @@ export default function MiraiHomesPage() {
                 xlinkHref="https://assets.codepen.io/721952/cloud2.png"
                 width="1200"
                 height="800"
-                style={{ willChange: 'transform' }}
               />
               <image
                 className="cloud1"
                 xlinkHref="https://assets.codepen.io/721952/cloud1.png"
                 width="1200"
                 height="800"
-                style={{ willChange: 'transform' }}
               />
               <image
                 className="cloud3"
                 xlinkHref="https://assets.codepen.io/721952/cloud3.png"
                 width="1200"
                 height="800"
-                style={{ willChange: 'transform' }}
               />
 
               <g mask="url(#m)">
@@ -419,3 +414,5 @@ export default function MiraiHomesPage() {
     </>
   );
 }
+
+```
