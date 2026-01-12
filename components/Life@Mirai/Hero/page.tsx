@@ -51,60 +51,66 @@ const blogPosts = [
 ];
 
 export default function MiraiHomesPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [showHeadText, setShowHeadText] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const mainRef = useRef<HTMLElement>(null);
+  const scrollDistRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const blogRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressPathRef = useRef<SVGPathElement>(null);
 
-  // Handle mounting and scroll position
+  // Preloader effect
   useEffect(() => {
-    // Prevent scroll restoration
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
-    
-    // Set scroll to top
-    window.scrollTo(0, 0);
-    
-    // Mark as mounted after a brief delay
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setMounted(true);
+    const interval = setInterval(() => {
+      setLoadProgress((prev) => {
+        if (prev >= 99) {
+          clearInterval(interval);
+          return 99;
+        }
+        return prev + 1;
       });
-    });
+    }, 20);
+
+    const timer = setTimeout(() => {
+      setLoadProgress(100);
+      setTimeout(() => setIsLoading(false), 500);
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
   }, []);
 
   // GSAP Parallax and reveal animations
   useEffect(() => {
-    if (!mounted) return;
+    if (isLoading) return;
 
     const ctx = gsap.context(() => {
-      // Parallax for each cloud layer - using separate ScrollTriggers
-      const clouds = [
-        { selector: ".sky", distance: -200 },
-        { selector: ".cloud2", distance: -500 },
-        { selector: ".cloud1", distance: -800 },
-        { selector: ".cloud3", distance: -650 },
-      ];
-
-      clouds.forEach(({ selector, distance }) => {
-        const element = document.querySelector(selector);
-        if (!element) return;
-
-        ScrollTrigger.create({
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          onUpdate: (self) => {
-            const progress = self.progress;
-            gsap.set(element, { y: progress * distance });
-          },
-        });
+      // Parallax animation for clouds and sky using ScrollTrigger with onUpdate
+      ScrollTrigger.create({
+        trigger: scrollDistRef.current,
+        start: "0 0",
+        end: "100% 100%",
+        onUpdate: (self) => {
+          const progress = self.progress;
+          
+          // Sky moves slowest
+          gsap.set(".sky", { y: progress * -200 });
+          
+          // Cloud1 moves from y:100 to y:-800 (total -900 distance)
+          gsap.set(".cloud1", { y: 100 + (progress * -900) });
+          
+          // Cloud2 moves from y:-150 to y:-500 (total -350 distance)
+          gsap.set(".cloud2", { y: -150 + (progress * -350) });
+          
+          // Cloud3 moves from y:-50 to y:-650 (total -600 distance)
+          gsap.set(".cloud3", { y: -50 + (progress * -600) });
+        },
       });
 
       // Blog card reveal animations
@@ -115,7 +121,7 @@ export default function MiraiHomesPage() {
         const imageInner = container.querySelector(".image-inner");
         const isLeft = blogPosts[index].imagePosition === "left";
 
-        const cardTl = gsap.timeline({
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: container,
             start: "top 80%",
@@ -123,7 +129,7 @@ export default function MiraiHomesPage() {
           },
         });
 
-        cardTl.fromTo(
+        tl.fromTo(
           imageContainer,
           { xPercent: isLeft ? -100 : 100, opacity: 0 },
           { xPercent: 0, opacity: 1, duration: 1.2, ease: "power2.out" }
@@ -134,26 +140,24 @@ export default function MiraiHomesPage() {
           "<"
         );
       });
-
-      ScrollTrigger.refresh();
     }, mainRef);
 
     return () => ctx.revert();
-  }, [mounted]);
+  }, [isLoading]);
 
   // Scroll event handlers
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      const scrollPercent = (scrollTop / docHeight) * 100;
 
       setScrollProgress(scrollPercent);
       setShowScrollTop(scrollTop > 50);
       setShowHeadText(scrollTop > 100);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -175,102 +179,111 @@ export default function MiraiHomesPage() {
 
   return (
     <>
-      <main ref={mainRef} className="bg-white" style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.3s' }}>
-        {/* ==================== PARALLAX HERO SECTION ==================== */}
-        <section ref={heroRef} className="relative h-screen overflow-hidden bg-gradient-to-b from-blue-400 to-blue-200">
-          {/* SVG Parallax Container */}
-          <div className="absolute inset-0 w-full h-full z-0">
-            <svg 
-              viewBox="0 0 1200 800" 
-              xmlns="http://www.w3.org/2000/svg" 
-              xmlnsXlink="http://www.w3.org/1999/xlink"
-              className="absolute top-0 left-0 w-full h-full"
-              preserveAspectRatio="xMidYMid slice"
-              style={{ minHeight: '100vh' }}
-            >
-              <defs>
-                <mask id="cloudMask">
-                  <g className="cloud1">
-                    <rect fill="#fff" width="100%" height="801" y="799" />
-                    <image
-                      xlinkHref="https://assets.codepen.io/721952/cloud1Mask.jpg"
-                      width="1200"
-                      height="800"
-                    />
-                  </g>
-                </mask>
-              </defs>
+      {/* ==================== PRELOADER ==================== */}
+      <div
+        className={`fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900 transition-opacity duration-1000 ${
+          !isLoading ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl animate-pulse" />
+        </div>
 
-              {/* Sky Background */}
-              <image
-                className="sky"
-                xlinkHref="https://azure-baboon-302476.hostingersite.com//mirai_/media/footer_img.png"
-                x="0"
-                y="0"
-                width="1200"
-                height="800"
-                preserveAspectRatio="xMidYMid slice"
-              />
-
-              {/* Cloud Layers */}
-              <image
-                className="cloud2"
-                xlinkHref="https://assets.codepen.io/721952/cloud2.png"
-                x="0"
-                y="0"
-                width="1200"
-                height="800"
-                opacity="0.9"
-              />
-              <image
-                className="cloud1"
-                xlinkHref="https://assets.codepen.io/721952/cloud1.png"
-                x="0"
-                y="0"
-                width="1200"
-                height="800"
-                opacity="0.95"
-              />
-              <image
-                className="cloud3"
-                xlinkHref="https://assets.codepen.io/721952/cloud3.png"
-                x="0"
-                y="0"
-                width="1200"
-                height="800"
-                opacity="1"
-              />
-
-              {/* White Mask at Bottom */}
-              <g mask="url(#cloudMask)">
-                <rect fill="#fff" width="100%" height="100%" />
-              </g>
-            </svg>
+        <div className="relative flex flex-col items-center gap-8">
+          <div className="relative">
+            <div className="w-24 h-24 border border-amber-500/30 rotate-45 animate-[spin_8s_linear_infinite]" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-3xl font-serif text-amber-500 tracking-widest">M</span>
+            </div>
           </div>
+
+          <div className="w-48 h-[1px] bg-slate-700 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-100 ease-out"
+              style={{ width: `${loadProgress}%` }}
+            />
+          </div>
+
+          <span className="text-amber-500/80 text-sm tracking-[0.3em] font-light">
+            {loadProgress}%
+          </span>
+        </div>
+      </div>
+
+      {/* ==================== MAIN CONTENT ==================== */}
+      <main
+        ref={mainRef}
+        className={`transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}
+      >
+        {/* Scroll Distance Trigger */}
+        <div ref={scrollDistRef} className="h-[200vh] absolute w-full" />
+
+        {/* ==================== PARALLAX HERO SECTION ==================== */}
+        <section ref={heroRef} className="relative mb-8 lg:mb-12">
+          <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+            <defs>
+              <mask id="m">
+                <g className="cloud1">
+                  <rect fill="#fff" width="100%" height="801" y="799" />
+                  <image
+                    xlinkHref="https://assets.codepen.io/721952/cloud1Mask.jpg"
+                    width="1200"
+                    height="800"
+                  />
+                </g>
+              </mask>
+              <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#1a365d" />
+                <stop offset="50%" stopColor="#2c5282" />
+                <stop offset="100%" stopColor="#4299e1" />
+              </linearGradient>
+            </defs>
+
+            <image
+              className="sky"
+              xlinkHref="https://azure-baboon-302476.hostingersite.com//mirai_/media/footer_img.png"
+              width="1200"
+              height="679"
+              preserveAspectRatio="xMidYMid slice"
+            />
+
+            <image
+              className="cloud2"
+              xlinkHref="https://assets.codepen.io/721952/cloud2.png"
+              width="1200"
+              height="800"
+            />
+            <image
+              className="cloud1"
+              xlinkHref="https://assets.codepen.io/721952/cloud1.png"
+              width="1200"
+              height="800"
+            />
+            <image
+              className="cloud3"
+              xlinkHref="https://assets.codepen.io/721952/cloud3.png"
+              width="1200"
+              height="800"
+            />
+
+            <g mask="url(#m)">
+              <rect fill="#fff" width="100%" height="90%" />
+            </g>
+          </svg>
 
           {/* Head Text Overlay */}
           <div
-            className={`absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10 transition-all duration-700 ${
+            className={`absolute inset-0 flex flex-col items-center justify-center text-center px-4 transition-all duration-700 ${
               showHeadText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <h2 
-              className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif mb-6 leading-tight"
-              style={{ 
-                color: '#78252f',
-                textShadow: '0 2px 30px rgba(255,255,255,0.9), 0 4px 60px rgba(255,255,255,0.7)'
-              }}
-            >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 leading-tight drop-shadow-2xl">
               Here&apos;s What Life at the Sixth Element
               <br />
               Feels Like
             </h2>
-            <p 
-              className="max-w-2xl text-gray-800 text-base md:text-lg lg:text-xl leading-relaxed font-light"
-              style={{
-                textShadow: '0 2px 20px rgba(255,255,255,0.95), 0 4px 40px rgba(255,255,255,0.8)'
-              }}
-            >
+            <p className="max-w-2xl text-white/90 text-base md:text-lg leading-relaxed drop-shadow-lg">
               When you choose Mirai, you choose a benchmark of opulence that&apos;s seldom
               traversed. It gives you access to a lifestyle less known, and lesser experienced.
               This is the sort of life that unravels here at Mirai.
