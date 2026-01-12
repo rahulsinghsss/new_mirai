@@ -310,16 +310,8 @@ export default function MiraiHomesPage() {
                           <div className="pt-4 text-right">
                             <Link
                               href={post.href}
-                              className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 group"
-                              style={{ borderColor: '#78252f', color: '#78252f' }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#78252f';
-                                e.currentTarget.style.color = 'white';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = '#78252f';
-                              }}
+                              className="inline-flex items-center justify-center transition-all duration-300 group"
+                              style={{ color: '#78252f' }}
                             >
                               <svg
                                 className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
@@ -353,7 +345,7 @@ export default function MiraiHomesPage() {
                           <div className="pt-4 text-right">
                             <Link
                               href={post.href}
-                              className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white transition-all duration-300 group"
+                              className="inline-flex items-center justify-center text-amber-600 transition-all duration-300 group"
                             >
                               <svg
                                 className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
