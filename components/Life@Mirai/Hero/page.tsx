@@ -150,13 +150,8 @@ export default function MiraiHomesPage() {
   return (
     <>
       <main ref={mainRef} className="bg-white">
-        {/* Scroll Distance Trigger - needs to be outside for GSAP to work */}
-        <div ref={scrollDistRef} className="h-[200vh] absolute w-full top-0 left-0 pointer-events-none z-0" />
-        
         {/* ==================== PARALLAX HERO SECTION ==================== */}
-        <section ref={heroRef} className="relative h-screen overflow-hidden bg-gradient-to-b from-blue-400 to-blue-200"
-
-        >
+        <section ref={heroRef} className="relative h-screen overflow-hidden bg-gradient-to-b from-blue-400 to-blue-200">
           {/* SVG Parallax Container - positioned to fill the hero section */}
           <div className="absolute inset-0 w-full h-full z-0">
             <svg 
