@@ -85,13 +85,11 @@ export default function MiraiHomesPage() {
       clearTimeout(timer);
     };
   }, []);
-
-  // GSAP Parallax and reveal animations
   useEffect(() => {
     if (isLoading) return;
 
     const ctx = gsap.context(() => {
-      // Parallax animation for clouds and sky
+      // Smooth parallax animation for clouds and sky
       gsap.timeline({
         scrollTrigger: {
           trigger: scrollDistRef.current,
@@ -113,7 +111,7 @@ export default function MiraiHomesPage() {
         const imageInner = container.querySelector(".image-inner");
         const isLeft = blogPosts[index].imagePosition === "left";
 
-        const tl = gsap.timeline({
+        const cardTl = gsap.timeline({
           scrollTrigger: {
             trigger: container,
             start: "top 80%",
@@ -121,7 +119,7 @@ export default function MiraiHomesPage() {
           },
         });
 
-        tl.fromTo(
+        cardTl.fromTo(
           imageContainer,
           { xPercent: isLeft ? -100 : 100, opacity: 0 },
           { xPercent: 0, opacity: 1, duration: 1.2, ease: "power2.out" }
@@ -132,6 +130,9 @@ export default function MiraiHomesPage() {
           "<"
         );
       });
+
+      // Refresh ScrollTrigger
+      ScrollTrigger.refresh();
     }, mainRef);
 
     return () => ctx.revert();
@@ -142,14 +143,14 @@ export default function MiraiHomesPage() {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
 
       setScrollProgress(scrollPercent);
       setShowScrollTop(scrollTop > 50);
       setShowHeadText(scrollTop > 100);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -225,11 +226,6 @@ export default function MiraiHomesPage() {
                   />
                 </g>
               </mask>
-              <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#1a365d" />
-                <stop offset="50%" stopColor="#2c5282" />
-                <stop offset="100%" stopColor="#4299e1" />
-              </linearGradient>
             </defs>
 
             <image
@@ -270,12 +266,23 @@ export default function MiraiHomesPage() {
               showHeadText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 leading-tight drop-shadow-2xl">
+            <h2 
+              className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif mb-6 leading-tight"
+              style={{ 
+                color: '#78252f',
+                textShadow: '0 2px 30px rgba(255,255,255,0.9), 0 4px 60px rgba(255,255,255,0.7)'
+              }}
+            >
               Here&apos;s What Life at the Sixth Element
               <br />
               Feels Like
             </h2>
-            <p className="max-w-2xl text-white/90 text-base md:text-lg leading-relaxed drop-shadow-lg">
+            <p 
+              className="max-w-2xl text-gray-800 text-base md:text-lg lg:text-xl leading-relaxed font-light"
+              style={{
+                textShadow: '0 2px 20px rgba(255,255,255,0.95), 0 4px 40px rgba(255,255,255,0.8)'
+              }}
+            >
               When you choose Mirai, you choose a benchmark of opulence that&apos;s seldom
               traversed. It gives you access to a lifestyle less known, and lesser experienced.
               This is the sort of life that unravels here at Mirai.
