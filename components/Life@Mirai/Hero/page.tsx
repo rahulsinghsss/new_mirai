@@ -62,6 +62,9 @@ export default function MiraiHomesPage() {
 
   // GSAP Parallax and reveal animations
   useEffect(() => {
+    // Set initial positions to prevent jump
+    gsap.set([".sky", ".cloud1", ".cloud2", ".cloud3"], { y: 0 });
+
     const ctx = gsap.context(() => {
       // Smooth parallax animation for clouds and sky
       const parallaxTimeline = gsap.timeline({
@@ -71,6 +74,7 @@ export default function MiraiHomesPage() {
           end: "bottom top",
           scrub: 1.5,
           markers: false,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -184,7 +188,6 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 preserveAspectRatio="xMidYMid slice"
-                style={{ transformOrigin: 'center center' }}
               />
 
               {/* Cloud Layers - visible layers */}
@@ -196,7 +199,6 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="0.9"
-                style={{ transformOrigin: 'center center' }}
               />
               <image
                 className="cloud1"
@@ -206,7 +208,6 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="0.95"
-                style={{ transformOrigin: 'center center' }}
               />
               <image
                 className="cloud3"
@@ -216,7 +217,6 @@ export default function MiraiHomesPage() {
                 width="1200"
                 height="800"
                 opacity="1"
-                style={{ transformOrigin: 'center center' }}
               />
 
               {/* White Mask at Bottom */}
