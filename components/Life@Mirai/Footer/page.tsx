@@ -167,7 +167,7 @@ function Footer() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Image
-          src="https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.png"
+          src="https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.jpg"
           alt="Footer background"
           fill
           className="object-cover scale-110 translate-x-[10%] translate-y-[10%]"
