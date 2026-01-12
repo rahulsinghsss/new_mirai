@@ -1,5 +1,5 @@
 import React from 'react'
-import Footer from '@/components/Life@Mirai/Footer/Footer'
+import Footer from '@/components/Life@Mirai/Footer/page'
 import MiraiHomesPage from '@/components/Life@Mirai/Hero/page'
 
 const page = () => {
@@ -10,4 +10,5 @@ const page = () => {
 }
 
 export default page
+
 
