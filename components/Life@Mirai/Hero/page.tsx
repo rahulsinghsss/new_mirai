@@ -64,6 +64,12 @@ export default function MiraiHomesPage() {
   // GSAP Parallax and reveal animations
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Set initial positions for clouds and sky
+      gsap.set(".sky", { y: 0 });
+      gsap.set(".cloud1", { y: 100 });
+      gsap.set(".cloud2", { y: -150 });
+      gsap.set(".cloud3", { y: -50 });
+
       // Parallax animation for clouds and sky using onUpdate for smoother performance
       ScrollTrigger.create({
         trigger: scrollDistRef.current,
