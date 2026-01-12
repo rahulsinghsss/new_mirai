@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 const textDropLines = [
-  { text: 'Indulgence', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80' },
-  { text: 'That Helps', image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80' },
-  { text: 'You to Stay in', image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80' },
-  { text: 'Your Element', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80' },
+  { text: 'Indulgence', image: 'https://d3p1hokpi6aqc3.cloudfront.net/AQUA%20POD_1.png' },
+  { text: 'That Helps', image: 'https://d3p1hokpi6aqc3.cloudfront.net/Avia_Pod_1.png' },
+  { text: 'You to Stay in', image: 'https://d3p1hokpi6aqc3.cloudfront.net/Pyro_Pod_1.png' },
+  { text: 'Your Element', image: 'https://d3p1hokpi6aqc3.cloudfront.net/Aminites_Tera_Pods_1.png' },
 ];
 
 export default function MiraiAmenitiesShowcase() {
