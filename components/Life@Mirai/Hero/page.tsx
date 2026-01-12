@@ -64,19 +64,19 @@ export default function MiraiHomesPage() {
   // GSAP Parallax and reveal animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Parallax animation for clouds and sky - exact same as reference
+      // Parallax animation for clouds and sky - only animates on scroll
       gsap.timeline({
         scrollTrigger: {
           trigger: scrollDistRef.current,
-          start: "0 0",
-          end: "100% 100%",
+          start: "top top",
+          end: "bottom bottom",
           scrub: 1,
         },
       })
-        .fromTo(".sky", { y: 0 }, { y: -200 }, 0)
-        .fromTo(".cloud1", { y: 100 }, { y: -800 }, 0)
-        .fromTo(".cloud2", { y: -150 }, { y: -500 }, 0)
-        .fromTo(".cloud3", { y: -50 }, { y: -650 }, 0);
+        .to(".sky", { y: -200 }, 0)
+        .to(".cloud1", { y: -800 }, 0)
+        .to(".cloud2", { y: -500 }, 0)
+        .to(".cloud3", { y: -650 }, 0);
 
       // Blog card reveal animations
       blogRefs.current.forEach((container, index) => {
