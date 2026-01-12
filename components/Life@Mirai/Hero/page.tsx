@@ -64,19 +64,28 @@ export default function MiraiHomesPage() {
   // GSAP Parallax and reveal animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Parallax animation for clouds and sky
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: scrollDistRef.current,
-          start: "0 0",
-          end: "100% 100%",
-          scrub: 1,
+      // Parallax animation for clouds and sky using onUpdate for smoother performance
+      ScrollTrigger.create({
+        trigger: scrollDistRef.current,
+        start: "0 0",
+        end: "100% 100%",
+        scrub: 1,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          
+          // Sky moves slowest
+          gsap.set(".sky", { y: progress * -200 });
+          
+          // Cloud1 moves from y:100 to y:-800 (total -900 distance)
+          gsap.set(".cloud1", { y: 100 + (progress * -900) });
+          
+          // Cloud2 moves from y:-150 to y:-500 (total -350 distance)
+          gsap.set(".cloud2", { y: -150 + (progress * -350) });
+          
+          // Cloud3 moves from y:-50 to y:-650 (total -600 distance)
+          gsap.set(".cloud3", { y: -50 + (progress * -600) });
         },
-      })
-        .fromTo(".sky", { y: 0 }, { y: -200 }, 0)
-        .fromTo(".cloud1", { y: 100 }, { y: -800 }, 0)
-        .fromTo(".cloud2", { y: -150 }, { y: -500 }, 0)
-        .fromTo(".cloud3", { y: -50 }, { y: -650 }, 0);
+      });
 
       // Blog card reveal animations
       blogRefs.current.forEach((container, index) => {
