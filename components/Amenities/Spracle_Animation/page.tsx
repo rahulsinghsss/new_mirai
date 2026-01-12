@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
 
 interface SparkleLogoProps {
@@ -100,10 +99,10 @@ export default function IndulgenceClouds({
   ];
 
   const sectionClasses = `
-    flex flex-col justify-center items-center w-full
-    bg-transparent
+    flex flex-col justify-start items-center w-full
+    bg-white
     ${fullWindow 
-      ? 'h-screen px-4' 
+      ? 'h-screen px-4 pt-20 md:pt-24 lg:pt-32' 
       : 'min-h-0 py-5 gap-2'
     }
   `;
