@@ -54,7 +54,7 @@ export default function MiraiHomesPage() {
   const scrollDistRef = useRef(null);
   const heroRef = useRef(null);
   const blogRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const progressPathRef = useRef(null);
+  const progressPathRef = useRef<SVGCircleElement>(null);
 
   // GSAP Parallax and reveal animations
   useEffect(() => {
