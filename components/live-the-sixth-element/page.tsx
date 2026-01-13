@@ -279,17 +279,17 @@ export default function MiraiHomesPage() {
           </div>
 
           {/* Section 4 */}
-          <div className="bg-black text-white p-8 md:p-12 rounded-2xl">
-            <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
+          <div className="bg-[#78252f] p-8 md:p-12 rounded-2xl">
+            <h3 className="text-2xl md:text-3xl font-serif text-white mb-6">
               2,00,000 sq. ft. of Elemental Indulgence
             </h3>
-            <p className="mb-4 text-white/80">
+            <p className="mb-4 text-black">
               The grandeur of Pavani Mirai extends beyond design into scale and substance. With over 2,00,000 sq. ft. of amenities, every aspect of leisure and lifestyle has been reimagined for the discerning few.
             </p>
-            <p className="mb-4 text-white/80">
+            <p className="mb-4 text-black">
               From the podium amenities to the four-level clubhouse and the rooftop pods, each layer unfolds a new facet of refined living. Whether it's wellness, recreation, or relaxation, Mirai ensures that every experience resonates with sophistication and sensory delight.
             </p>
-            <p className="text-white/80">
+            <p className="text-black">
               The clubhouse serves as a contemporary sanctuary featuring luxury lounges, spa retreats, indoor courts, and fine dining spaces that blend seamlessly into their natural surroundings. Here, indulgence finds balance in design that feels alive.
             </p>
           </div>
