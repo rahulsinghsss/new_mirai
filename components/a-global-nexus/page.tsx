@@ -189,7 +189,7 @@ export default function MiraiHomesPage() {
             <p className="text-lg md:text-xl text-black/70 font-light leading-8">
               In a world where time and access define success, the true luxury of modern living lies in location. For today's discerning homebuyer, one who values convenience as much as comfort, <strong>Pavani Mirai Hyderabad</strong> offers a rare confluence of both. Rising majestically in the heart of Hyderabad's Financial District, this landmark development by Pavani Infra represents not just a place of residence but a strategic investment in lifestyle, connectivity, and global relevance.
             </p>
-            <p className="mt-6 text-black/80">
+            <p className="mt-6 text-lg text-black/80">
               At Mirai, luxury transcends aesthetics. It is redefined through geography where the world's leading corporations, educational institutions, and entertainment avenues lie just minutes away. This is the address that connects you to the pulse of progress, while cocooning you in the serenity of elevated, sky-kissed living.
             </p>
           </div>
@@ -199,13 +199,13 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               Where Hyderabad Meets the World
             </h3>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               The Financial District of Hyderabad is an ecosystem of growth and ambition. Home to global giants such as Amazon, Capgemini, Cognizant, Microsoft, and Google, the district has evolved into one of India's most dynamic business corridors. It's where the brightest minds converge, and where every sunrise brings new opportunities.
             </p>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               Located strategically within this thriving hub, Pavani Mirai enjoys unparalleled proximity to both global workplaces and premium lifestyle destinations. The development stands as a beacon of luxury apartments in the Financial District, Hyderabad, designed for those who wish to stay ahead of the curve while staying grounded in comfort.
             </p>
-            <p className="italic border-l-4 border-[#78252f] pl-4 text-[#78252f]">
+            <p className="text-lg italic border-l-4 border-[#78252f] pl-4 text-[#78252f]">
               With institutions like ISB (Indian School of Business) and University of Hyderabad just a short drive away, Pavani Mirai also lies within a knowledge and innovation belt that continues to attract visionaries from around the world.
             </p>
           </div>
@@ -215,15 +215,15 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               The Advantage of Connectivity
             </h3>
-            <p className="mb-6 text-black/80">
+            <p className="mb-6 text-lg text-black/80">
               When choosing a home, location is more about time saved and opportunities gained. Pavani Mirai's address ensures effortless mobility across the city, empowering you to move fluidly between the professional and the personal.
             </p>
             
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-               <li className="flex items-center gap-2 text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Seamless Access:</strong> Outer Ring Road (ORR) & Old Mumbai Highway</li>
-               <li className="flex items-center gap-2 text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Key Hubs:</strong> Gachibowli, HITEC City, Kokapet & Nanakramguda</li>
-               <li className="flex items-center gap-2 text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Global Travel:</strong> Quick drive to Rajiv Gandhi International Airport</li>
-               <li className="flex items-center gap-2 text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Lifestyle:</strong> Upscale retail, healthcare & fine-dining avenues</li>
+               <li className="flex items-center gap-2 text-lg text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Seamless Access:</strong> Outer Ring Road (ORR) & Old Mumbai Highway</li>
+               <li className="flex items-center gap-2 text-lg text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Key Hubs:</strong> Gachibowli, HITEC City, Kokapet & Nanakramguda</li>
+               <li className="flex items-center gap-2 text-lg text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Global Travel:</strong> Quick drive to Rajiv Gandhi International Airport</li>
+               <li className="flex items-center gap-2 text-lg text-black/80"><span className="w-2 h-2 bg-[#78252f] rounded-full"></span> <strong>Lifestyle:</strong> Upscale retail, healthcare & fine-dining avenues</li>
             </ul>
 
             <p className="text-black/70 text-sm leading-relaxed">
@@ -236,10 +236,10 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               Architected for Global Lifestyles
             </h3>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               Every inch of Pavani Mirai Hyderabad has been crafted to complement its world-class location. Soaring 55 floors high, the tower is a landmark of vertical luxury, housing 178 residences, including 8 duplex apartments in Hyderabad that redefine the art of expansive living.
             </p>
-            <p className="text-black/80">
+            <p className="text-lg text-black/80">
               Each residence at Mirai mirrors international standards with sprawling interiors, intelligent layouts, and panoramic decks offering 270° views of the cityscape. The design philosophy integrates the five elements of nature, culminating in a sixth - the spirit of balance and elevation. From the 40-ft-high grand entrance that welcomes you into its fold to the 2,00,000 sq. ft. of lifestyle amenities, every facet resonates with the refined sensibilities of global citizens.
             </p>
           </div>
@@ -249,13 +249,13 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-white mb-6">
               Luxury that Moves with You
             </h3>
-            <p className="mb-4 text-white">
+            <p className="mb-4 text-lg text-white">
               The Financial District isn't just about work - it's about the lifestyle that comes with success. And Pavani Mirai complements that lifestyle perfectly.
             </p>
-            <p className="mb-4 text-white">
+            <p className="mb-4 text-lg text-white">
               Here, mornings can begin with a rejuvenating swim at the <strong>Rooftop Water Pod's</strong> infinity pool, afternoons can flow into meetings at the <strong>Air Pod's</strong> business lounge, and evenings can wind down at the <strong>Fire Pod's</strong> sky bar or bonfire arena - all just an elevator ride away.
             </p>
-            <p className="text-white">
+            <p className="text-lg text-white">
               Mirai has curated a world within itself. With an expansive clubhouse spread across four levels, a range of wellness zones, and biophilic landscapes covering 75% open green area, it offers a life of balance and rejuvenation amidst the fast-paced rhythm of the city.
             </p>
           </div>
@@ -265,10 +265,10 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               Investment That Aligns with the Future
             </h3>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               Hyderabad continues to rise as India's most livable city and one of the fastest-growing real estate markets. The Financial District, in particular, has become the epicentre of premium development, with infrastructure, employment, and urban amenities converging to create long-term value.
             </p>
-            <p className="text-black/80">
+            <p className="text-lg text-black/80">
               Investing in Pavani Mirai is not just about buying a luxury home, it's about acquiring a future-forward asset in the most strategic zone of the city. The project's architectural grandeur, limited number of residences, and premium address ensure exclusivity that will only appreciate over time. For those seeking luxury apartments in the Financial District Hyderabad that offer both lifestyle and legacy, Mirai stands as a rare opportunity.
             </p>
           </div>
@@ -278,16 +278,16 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-8 text-center">FAQs</h3>
             <div className="space-y-8">
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">1. What makes the location of Pavani Mirai a strategic advantage?</h5>
-                <p className="text-black/70">Pavani Mirai's location in Hyderabad's Financial District places residents at the core of the city's corporate and cultural pulse. The project enjoys close proximity to major tech campuses, international schools, and entertainment hubs. With seamless connectivity via ORR and Old Mumbai Highway, residents can move effortlessly between work, leisure, and travel destinations.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">1. What makes the location of Pavani Mirai a strategic advantage?</h5>
+                <p className="text-lg text-black/70">Pavani Mirai's location in Hyderabad's Financial District places residents at the core of the city's corporate and cultural pulse. The project enjoys close proximity to major tech campuses, international schools, and entertainment hubs. With seamless connectivity via ORR and Old Mumbai Highway, residents can move effortlessly between work, leisure, and travel destinations.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">2. Is Pavani Mirai close to major tech and corporate campuses?</h5>
-                <p className="text-black/70">Yes. Pavani Mirai is situated just minutes away from renowned corporate offices such as Amazon Hyderabad, Capgemini, Cognizant, Microsoft, and Deloitte, as well as prestigious institutions like ISB. Its location makes it ideal for professionals who value shorter commutes and an elevated quality of life.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">2. Is Pavani Mirai close to major tech and corporate campuses?</h5>
+                <p className="text-lg text-black/70">Yes. Pavani Mirai is situated just minutes away from renowned corporate offices such as Amazon Hyderabad, Capgemini, Cognizant, Microsoft, and Deloitte, as well as prestigious institutions like ISB. Its location makes it ideal for professionals who value shorter commutes and an elevated quality of life.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">3. How is the connectivity to the rest of Hyderabad?</h5>
-                <p className="text-black/70">Pavani Mirai offers unmatched connectivity. The Outer Ring Road provides quick access to all major destinations, including the airport, Gachibowli, HITEC City, and Kokapet. This ease of movement ensures residents can experience the best of both urban convenience and serene living - all from one address.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">3. How is the connectivity to the rest of Hyderabad?</h5>
+                <p className="text-lg text-black/70">Pavani Mirai offers unmatched connectivity. The Outer Ring Road provides quick access to all major destinations, including the airport, Gachibowli, HITEC City, and Kokapet. This ease of movement ensures residents can experience the best of both urban convenience and serene living - all from one address.</p>
               </div>
             </div>
           </div>
@@ -297,10 +297,10 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               A Global Address, A Personal Sanctuary
             </h3>
-            <p className="mb-6 max-w-2xl mx-auto text-black/80">
+            <p className="mb-6 text-lg max-w-2xl mx-auto text-black/80">
               In essence, Pavani Mirai Hyderabad captures the future of urban living where strategic location meets soulful design. It represents the harmony of ambition and tranquility, global mobility and grounded luxury.
             </p>
-            <p className="mb-8 max-w-2xl mx-auto text-black/80">
+            <p className="mb-8 text-lg max-w-2xl mx-auto text-black/80">
               For those seeking duplex apartments in Hyderabad or luxury apartments in the Financial District, Mirai is not merely a residence, it's a statement. A statement of having arrived, of belonging to a world that values not just where you live, but how you live.
             </p>
             
@@ -309,7 +309,7 @@ export default function MiraiHomesPage() {
                 Here, you don't just find a home.<br/>
                 You find your place in the world's most connected circle.
               </p>
-              <p className="mt-4 font-serif text-2xl text-[#78252f] font-bold">
+              <p className="mt-4 font-serif text-2xl text-[#78252f] font-normal">
                 A Global Nexus.<br/>
                 Pavani Mirai.
               </p>
