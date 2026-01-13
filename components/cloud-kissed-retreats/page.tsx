@@ -189,13 +189,13 @@ export default function MiraiHomesPage() {
             <p className="text-lg md:text-xl text-black/70 font-light leading-8">
               High above the bustle of the city, where the clouds drift unhurried and the horizon stretches endlessly, lies a sanctuary unlike any other - the <strong>Elemental Sky Pods</strong> at Pavani Mirai.
             </p>
-            <p className="mt-6 text-black/80">
+            <p className="mt-6 text-lg text-black/80">
               Perched atop a 55-storey architectural marvel, these Sky Pods are not mere rooftop amenities. They are living expressions of nature's forces, designed to immerse residents in experiences that are sensory and sublime. Together, they define the soul of Pavani Mirai, the futuristic apartments in Hyderabad that reimagine what it means to live in harmony with the elements.
             </p>
-            <p className="mt-6 text-black/80">
+            <p className="mt-6 text-lg text-black/80">
               In a world where luxury often means opulence, Mirai dares to go deeper by creating spaces that transcend indulgence and touch serenity itself. Each of the four Elemental Sky Pods, Air, Water, Fire, and Earth, offers its own unique realm of recreation and reflection, culminating in a lifestyle that's elevated in every sense.
             </p>
-            <p className="mt-4 italic border-l-4 border-[#78252f] pl-4 text-[#78252f]">
+            <p className="mt-4 text-lg italic border-l-4 border-[#78252f] pl-4 text-[#78252f]">
               This is not just luxury high-rise living in Hyderabad; this is life among the clouds.
             </p>
           </div>
@@ -205,10 +205,10 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               A Vision Above the Skyline
             </h3>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               Nestled in the Financial District of Hyderabad, Pavani Mirai is a singular tower rising 55 floors high across 2.46 acres, home to 178 residences and 8 exclusive duplex sky villas. Designed by Pavani Infra, it celebrates the philosophy of elemental balance where Earth, Water, Fire, Air, and Space converge to create the <strong>Sixth Element</strong>: Mirai itself.
             </p>
-            <p className="text-black/80">
+            <p className="text-lg text-black/80">
               Crowning this vertical masterpiece are the Sky Pods that are immersive rooftop sanctuaries that transform the roof into a destination. Each pod is dedicated to one element, offering thoughtfully curated amenities that embody its character. Whether it's the stillness of water, the warmth of fire, or the energy of earth.
             </p>
           </div>
@@ -218,14 +218,14 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-8">
               The Elemental Pods
             </h3>
-            <p className="mb-8 text-black/80">
+            <p className="mb-8 text-lg text-black/80">
                Below is how the philosophy of the elements comes to life in our unique architectural pods:
             </p>
 
             <div className="grid gap-8 md:grid-cols-2">
               {/* Air Pod */}
               <div className="border-t-2 border-black/20 pt-4">
-                <h4 className="text-xl font-bold text-[#78252f] mb-2">1. The Air Pod – Freedom Above the Horizon</h4>
+                <h4 className="text-xl font-normal text-[#78252f] mb-2">1. The Air Pod – Freedom Above the Horizon</h4>
                 <p className="text-sm text-black/70">
                   The Air Pod is a sanctuary of openness. Floating high above the city, it invites residents into tranquil spaces where gentle breezes and panoramic views awaken the senses. Meditation decks, yoga zones, and open lounges create an atmosphere of calm, which reminds you that true luxury is space to breathe freely.
                 </p>
@@ -233,7 +233,7 @@ export default function MiraiHomesPage() {
 
               {/* Water Pod */}
               <div className="border-t-2 border-black/20 pt-4">
-                <h4 className="text-xl font-bold text-[#78252f] mb-2">2. The Water Pod – Tranquillity in Motion</h4>
+                <h4 className="text-xl font-normal text-[#78252f] mb-2">2. The Water Pod – Tranquillity in Motion</h4>
                 <p className="text-sm text-black/70">
                   Water brings fluidity and serenity to Mirai. The Water Pod, adorned with reflective pools and calming cascades, embodies the meditative essence of flow. It is where time slows down, and the ripples of water mirror the stillness within.
                 </p>
@@ -241,7 +241,7 @@ export default function MiraiHomesPage() {
 
               {/* Fire Pod */}
               <div className="border-t-2 border-black/20 pt-4">
-                <h4 className="text-xl font-bold text-[#78252f] mb-2">3. The Fire Pod – The Energy of Celebration</h4>
+                <h4 className="text-xl font-normal text-[#78252f] mb-2">3. The Fire Pod – The Energy of Celebration</h4>
                 <p className="text-sm text-black/70">
                   The Fire Pod symbolizes vitality and passion. Designed as the social heart of Mirai, it features ambient lounges, BBQ spots, sunset decks, and event spaces that radiate warmth. It's where energy gathers for conversation, connection, and celebration.
                 </p>
@@ -249,7 +249,7 @@ export default function MiraiHomesPage() {
 
               {/* Earth Pod */}
               <div className="border-t-2 border-black/20 pt-4">
-                <h4 className="text-xl font-bold text-[#78252f] mb-2">4. The Earth Pod – Grounded in Green</h4>
+                <h4 className="text-xl font-normal text-[#78252f] mb-2">4. The Earth Pod – Grounded in Green</h4>
                 <p className="text-sm text-black/70">
                   Lush greenscapes and tactile natural materials define the Earth Pod, creating a sanctuary of grounded elegance. It connects residents back to the roots of existence by offering a haven of calm amidst life's momentum.
                 </p>
@@ -262,13 +262,13 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-white mb-6">
               2,00,000 sq. ft. of Elemental Indulgence
             </h3>
-            <p className="mb-4 text-white">
+            <p className="mb-4 text-lg text-white">
               The grandeur of Pavani Mirai extends beyond design into scale and substance. With over 2,00,000 sq. ft. of amenities, every aspect of leisure and lifestyle has been reimagined for the discerning few.
             </p>
-            <p className="mb-4 text-white">
+            <p className="mb-4 text-lg text-white">
               From the podium amenities to the four-level clubhouse and the rooftop pods, each layer unfolds a new facet of refined living. Whether it's wellness, recreation, or relaxation, Mirai ensures that every experience resonates with sophistication and sensory delight.
             </p>
-            <p className="text-white">
+            <p className="text-lg text-white">
               The clubhouse serves as a contemporary sanctuary featuring luxury lounges, spa retreats, indoor courts, and fine dining spaces that blend seamlessly into their natural surroundings. Here, indulgence finds balance in design that feels alive.
             </p>
           </div>
@@ -278,13 +278,13 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               A New Dimension in Luxury Apartments in Hyderabad
             </h3>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               In the city's growing landscape of luxury apartments in Hyderabad, Pavani Mirai rises as a distinct narrative that intertwines nature, architecture, and emotion. Unlike conventional high-rises that focus solely on visual grandeur, Mirai focuses on experiential depth.
             </p>
-            <p className="mb-4 text-black/80">
+            <p className="mb-4 text-lg text-black/80">
               Each residence, whether an expansive sky villa or an elegant apartment, is meticulously planned to allow abundant natural light, cross-ventilation, and panoramic views. The material palette evokes calm, with organic textures and subtle tones that mirror the elegance of the elements themselves.
             </p>
-            <p className="text-black/80">
+            <p className="text-lg text-black/80">
               Located in the heart of Financial District and close to Nanakramguda and Nallagandla, Mirai's connectivity ensures that you remain at the heart of the city's most vibrant district, even as you rise above it all. For those seeking Nanakramguda apartments that promise more than proximity, Mirai stands unmatched.
             </p>
           </div>
@@ -294,16 +294,16 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-8 text-center">FAQs</h3>
             <div className="space-y-8">
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">1. What is the "Sixth Element" concept at Pavani Mirai?</h5>
-                <p className="text-black/70">The Sixth Element at Pavani Mirai represents the fusion of the five natural elements - Earth, Water, Fire, Air, and Space - into a singular, harmonious living experience. It symbolizes the point where design transcends aesthetics to embody emotional and environmental balance. Pavani Mirai itself becomes this Sixth Element, a living, breathing masterpiece that harmonizes nature's energies with modern luxury.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">1. What is the "Sixth Element" concept at Pavani Mirai?</h5>
+                <p className="text-lg text-black/70">The Sixth Element at Pavani Mirai represents the fusion of the five natural elements - Earth, Water, Fire, Air, and Space - into a singular, harmonious living experience. It symbolizes the point where design transcends aesthetics to embody emotional and environmental balance. Pavani Mirai itself becomes this Sixth Element, a living, breathing masterpiece that harmonizes nature's energies with modern luxury.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">2. How are the five elements integrated into the architectural design?</h5>
-                <p className="text-black/70">Each of the five elements finds its expression in Mirai's architectural framework. The four rooftop pods are dedicated to Air, Water, Fire, and Earth, each offering themed experiential zones that stimulate the senses and elevate well-being. The helipad, symbolizing Space, completes this elemental integration, together giving rise to the Sixth Element: the project as a whole.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">2. How are the five elements integrated into the architectural design?</h5>
+                <p className="text-lg text-black/70">Each of the five elements finds its expression in Mirai's architectural framework. The four rooftop pods are dedicated to Air, Water, Fire, and Earth, each offering themed experiential zones that stimulate the senses and elevate well-being. The helipad, symbolizing Space, completes this elemental integration, together giving rise to the Sixth Element: the project as a whole.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-[#78252f] mb-2">3. Does this philosophy improve the residents' well-being?</h5>
-                <p className="text-black/70">Absolutely. Pavani Mirai's design philosophy goes beyond aesthetics. It aims to enhance holistic well-being. By integrating natural elements into everyday living, it fosters emotional balance, physical comfort, and mental clarity. From air flow and daylight optimization to the sensory experiences created by water and greenery, every aspect of Mirai's design contributes to a calmer, more centered lifestyle.</p>
+                <h5 className="font-normal text-lg text-[#78252f] mb-2">3. Does this philosophy improve the residents' well-being?</h5>
+                <p className="text-lg text-black/70">Absolutely. Pavani Mirai's design philosophy goes beyond aesthetics. It aims to enhance holistic well-being. By integrating natural elements into everyday living, it fosters emotional balance, physical comfort, and mental clarity. From air flow and daylight optimization to the sensory experiences created by water and greenery, every aspect of Mirai's design contributes to a calmer, more centered lifestyle.</p>
               </div>
             </div>
           </div>
@@ -313,10 +313,10 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-6">
               Luxury, Redefined in Elemental Harmony
             </h3>
-            <p className="mb-6 max-w-2xl mx-auto text-black/80">
+            <p className="mb-6 text-lg max-w-2xl mx-auto text-black/80">
               In an era where luxury often feels detached from meaning, Pavani Mirai restores its soul. It transforms architectural ambition into a meditative experience of balance and beauty. It reminds us that luxury is not just about what we own - it's about how we feel, live, and connect.
             </p>
-            <p className="mb-8 max-w-2xl mx-auto text-black/80">
+            <p className="mb-8 text-lg max-w-2xl mx-auto text-black/80">
               At Pavani Mirai, the elements don't just surround you, they live with you. They breathe through every space, whisper through every texture, and resonate through every sunrise and sunset.
             </p>
             
@@ -324,7 +324,7 @@ export default function MiraiHomesPage() {
               <p className="text-xl font-light text-black">
                 Because when Earth, Water, Fire, Air, and Space come together in harmony, they create a higher state of being.
               </p>
-              <p className="mt-4 font-serif text-2xl text-[#78252f] font-bold">
+              <p className="mt-4 font-serif text-2xl text-[#78252f] font-normal">
                 That is the Sixth Element.<br/>
                 That is Pavani Mirai.
               </p>
