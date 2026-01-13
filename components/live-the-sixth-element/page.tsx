@@ -340,7 +340,6 @@ export default function MiraiHomesPage() {
             <p className="mb-8 max-w-2xl mx-auto text-black/80">
               At Pavani Mirai, the elements don't just surround you, they live with you. They breathe through every space, whisper through every texture, and resonate through every sunrise and sunset.
             </p>
-          </div>
             
             <div className="inline-block border-y-2 border-[#78252f] py-4 px-8 mt-4">
               <p className="text-xl font-light text-black">
@@ -354,8 +353,6 @@ export default function MiraiHomesPage() {
           </div>
 
         </div>
-        
-        <div className="pb-24"></div>
       </article>
 
       {/* ==================== SCROLL TO TOP BUTTON ==================== */}
