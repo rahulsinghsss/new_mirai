@@ -157,23 +157,17 @@ function Footer() {
 
   return (
     <footer
-      className="fixed bottom-0 left-0 right-0 text-[#bfc6cf] h-screen flex items-center overflow-hidden -z-10"
+      className="fixed bottom-0 left-0 right-0 text-[#bfc6cf] h-screen flex items-center overflow-hidden"
+      style={{ 
+        zIndex: 0,
+        backgroundImage: 'url(https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      }}
       role="contentinfo"
       aria-label="Footer - Pavani Mirai"
     >
-      {/* Background Image Container */}
-      <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-        <Image
-          src="https://d3p1hokpi6aqc3.cloudfront.net/039_PM_EXT_CAM68_LANDSCAPE%20AERIAL.jpg"
-          alt="Footer background"
-          fill
-          className="object-cover"
-          style={{
-            objectPosition: 'center center',
-          }}
-          priority
-        />
-      </div>
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
 
       <div 
