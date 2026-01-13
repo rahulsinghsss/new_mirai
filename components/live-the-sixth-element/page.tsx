@@ -315,15 +315,15 @@ export default function MiraiHomesPage() {
             <h3 className="text-2xl md:text-3xl font-serif text-[#78252f] mb-8 text-center">FAQs</h3>
             <div className="space-y-8">
               <div>
-                <h5 className="font-bold text-lg text-black mb-2">1. What is the "Sixth Element" concept at Pavani Mirai?</h5>
+                <h5 className="font-bold text-lg text-[#78252f] mb-2">1. What is the "Sixth Element" concept at Pavani Mirai?</h5>
                 <p className="text-black/70">The Sixth Element at Pavani Mirai represents the fusion of the five natural elements - Earth, Water, Fire, Air, and Space - into a singular, harmonious living experience. It symbolizes the point where design transcends aesthetics to embody emotional and environmental balance. Pavani Mirai itself becomes this Sixth Element, a living, breathing masterpiece that harmonizes nature's energies with modern luxury.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-black mb-2">2. How are the five elements integrated into the architectural design?</h5>
+                <h5 className="font-bold text-lg text-[#78252f] mb-2">2. How are the five elements integrated into the architectural design?</h5>
                 <p className="text-black/70">Each of the five elements finds its expression in Mirai's architectural framework. The four rooftop pods are dedicated to Air, Water, Fire, and Earth, each offering themed experiential zones that stimulate the senses and elevate well-being. The helipad, symbolizing Space, completes this elemental integration, together giving rise to the Sixth Element: the project as a whole.</p>
               </div>
               <div>
-                <h5 className="font-bold text-lg text-black mb-2">3. Does this philosophy improve the residents' well-being?</h5>
+                <h5 className="font-bold text-lg text-[#78252f] mb-2">3. Does this philosophy improve the residents' well-being?</h5>
                 <p className="text-black/70">Absolutely. Pavani Mirai's design philosophy goes beyond aesthetics. It aims to enhance holistic well-being. By integrating natural elements into everyday living, it fosters emotional balance, physical comfort, and mental clarity. From air flow and daylight optimization to the sensory experiences created by water and greenery, every aspect of Mirai's design contributes to a calmer, more centered lifestyle.</p>
               </div>
             </div>
