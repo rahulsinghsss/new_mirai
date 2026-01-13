@@ -225,7 +225,7 @@ export default function MiraiHomesPage() {
             <p className="text-black/80">
               Mirai draws from this universal truth to create something the Sixth Element. It is the point where these forces converge to form a new dimension of luxury living, one that balances physical indulgence with emotional and spiritual well-being.
             </p>
-            <blockquote className="mt-6 text-xl text-[#78252f] font-serif text-center font-bold">
+            <blockquote className="mt-6 text-xl text-[#78252f] font-serif text-center font-normal">
               &quot;The Sixth Element represents harmony in motion. It is where architecture breathes, materials speak, and every detail flows with the rhythm of nature.&quot;
             </blockquote>
           </div>
