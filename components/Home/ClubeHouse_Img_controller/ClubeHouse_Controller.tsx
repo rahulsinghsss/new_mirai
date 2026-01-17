@@ -111,7 +111,7 @@ export default function MiraiClubhouse() {
 
       {/* Decorative shape - Always visible */}
       <div className="absolute inset-0 pointer-events-none z-[50] overflow-hidden">
-        <div className="absolute right-[-20%] -top-2 w-[160vw] md:w-[150vw] lg:w-[140vw]">
+        <div className="absolute right-[-20%] -top-16 w-[160vw] md:w-[150vw] lg:w-[140vw]">
           <img
             src={shapeTwoPath}
             alt="Background shape"
