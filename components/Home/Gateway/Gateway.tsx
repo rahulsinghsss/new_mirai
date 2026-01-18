@@ -359,7 +359,7 @@ export function RevealZoom({
   }, [allImagesLoaded, setupCanvas]);
 
   // ============================================
-  // ANIMATION TIMELINE (Even faster building zoom)
+  // ANIMATION TIMELINE (Smoother building zoom)
   // ============================================
   useEffect(() => {
     if (typeof window === 'undefined' || !allImagesLoaded || !isReady) return;
@@ -397,14 +397,14 @@ export function RevealZoom({
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
     timelineRef.current = tl;
 
-    // --- PHASE 1: BUILDING ZOOM (0 - 2.5) - EVEN SHORTER ---
+    // --- PHASE 1: BUILDING ZOOM (0 - 2.5) - Smoother easing ---
     tl.to(shapeRef.current, { opacity: 0, duration: 0.6, ease: "power1.out" }, 0);
     tl.to(textRef.current, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.3);
     
     tl.to(buildingRef.current, { 
       scale: buildingZoomScale, 
       duration: 2.5,
-      ease: "power1.inOut",
+      ease: "sine.inOut",  // Smoother easing - less aggressive
       force3D: true
     }, 0);
 
@@ -416,7 +416,7 @@ export function RevealZoom({
     tl.to(animState.current, {
       scale: windowZoomScale,
       duration: 1.0,
-      ease: "power1.inOut",
+      ease: "sine.inOut",
       onUpdate: scheduleCanvasDraw,
     }, 2.5);
 
@@ -477,14 +477,14 @@ export function RevealZoom({
     // Hotspot 4: appears at 10
     revealHotspot(pointer4InnerRef, 10);
 
-    // Create ScrollTrigger after a small delay to ensure DOM is ready
+    // Create ScrollTrigger with higher scrub value for smoother animation
     const stTimer = setTimeout(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: wrapperRef.current,
         start: "top top",
         end: scrollDistance,
         pin: true,
-        scrub: 1,
+        scrub: 2.5,  // Higher value = smoother/slower catch-up when scrolling fast
         onUpdate: (self) => {
           if (!isLockedRef.current && timelineRef.current) {
             timelineRef.current.progress(self.progress);
