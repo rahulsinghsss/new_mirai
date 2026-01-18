@@ -147,7 +147,7 @@ export function RevealZoom({
   buildingImage = '/images/gateway/reveal.png',
   windowImage = '/images/gateway/mirai.png',
   shapeImage = '/images/gateway/shape-two.png',
-  scrollDistance = "+=350%",  // Reduced from 1100% for faster scrolling
+  scrollDistance = "+=550%",  // Balanced: not too slow, not too fast
   buildingZoomScale = 16,
   windowZoomScale = 2.5,
   windowMoveDistance = 1,
@@ -167,7 +167,7 @@ export function RevealZoom({
   // Inner refs
   const pointer1InnerRef = useRef<HTMLDivElement>(null);
   const pointer2InnerRef = useRef<HTMLDivElement>(null);
-  const pointer3InnerRef = useRef<HTMLDivElement>(null);
+  const pointer3InnerRef = useRef<HTMLDivElement>(null>;
   const pointer4InnerRef = useRef<HTMLDivElement>(null);
   
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -359,7 +359,7 @@ export function RevealZoom({
   }, [allImagesLoaded, setupCanvas]);
 
   // ============================================
-  // ANIMATION TIMELINE (Compressed for faster scroll)
+  // ANIMATION TIMELINE (Balanced timing)
   // ============================================
   useEffect(() => {
     if (typeof window === 'undefined' || !allImagesLoaded || !isReady) return;
@@ -397,33 +397,33 @@ export function RevealZoom({
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
     timelineRef.current = tl;
 
-    // --- PHASE 1: BUILDING ZOOM (0 - 2.5) ---
-    tl.to(shapeRef.current, { opacity: 0, duration: 0.6, ease: "power1.out" }, 0);
-    tl.to(textRef.current, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 0.5);
+    // --- PHASE 1: BUILDING ZOOM (0 - 4) ---
+    tl.to(shapeRef.current, { opacity: 0, duration: 1.0, ease: "power1.out" }, 0);
+    tl.to(textRef.current, { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }, 0.8);
     
     tl.to(buildingRef.current, { 
       scale: buildingZoomScale, 
-      duration: 2.5, 
+      duration: 4.0, 
       ease: "power1.inOut",
       force3D: true
     }, 0);
 
-    // --- PHASE 2: TRANSITION (2.5 - 3.2) ---
-    tl.to(buildingRef.current, { opacity: 0, duration: 0.5, ease: "power1.inOut" }, 2.5);
-    tl.to(textRef.current, { opacity: 0, y: -40, duration: 0.4, ease: "power1.in" }, 2.5);
+    // --- PHASE 2: TRANSITION (4 - 5) ---
+    tl.to(buildingRef.current, { opacity: 0, duration: 0.8, ease: "power1.inOut" }, 4);
+    tl.to(textRef.current, { opacity: 0, y: -40, duration: 0.6, ease: "power1.in" }, 4);
 
-    // --- PHASE 3: WINDOW ZOOM (3.2 - 4) ---
+    // --- PHASE 3: WINDOW ZOOM (5 - 6) ---
     tl.to(animState.current, {
       scale: windowZoomScale,
-      duration: 0.8,
+      duration: 1.0,
       ease: "power1.inOut",
       onUpdate: scheduleCanvasDraw,
-    }, 3.2);
+    }, 5);
 
-    // --- PHASE 4: PAN & HOTSPOTS (4 - 8) ---
+    // --- PHASE 4: PAN & HOTSPOTS (6 - 13) ---
     tl.to(animState.current, {
       panY: windowMoveDistance,
-      duration: 4.0,
+      duration: 7.0,
       ease: "sine.inOut",
       onUpdate: () => {
         scheduleCanvasDraw();
@@ -456,26 +456,26 @@ export function RevealZoom({
           if (pointer4Ref.current) pointer4Ref.current.style.transform = transformStyle;
         }
       },
-    }, 4);
+    }, 6);
 
-    // Hotspot reveal helper (compressed timings)
+    // Hotspot reveal helper
     const revealHotspot = (ref: React.RefObject<HTMLDivElement | null>, time: number) => {
-      tl.to(ref.current, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, time);
-      tl.to(ref.current, { opacity: 0, scale: 0.95, duration: 0.35, ease: "power1.in" }, time + 1.0);
+      tl.to(ref.current, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.4)" }, time);
+      tl.to(ref.current, { opacity: 0, scale: 0.95, duration: 0.5, ease: "power1.in" }, time + 1.5);
     };
 
-    // Hotspot 1: appears at 4.2, fades at 5.2
-    revealHotspot(pointer1InnerRef, 4.2);
+    // Hotspot 1: appears at 6.5
+    revealHotspot(pointer1InnerRef, 6.5);
     
-    // Hotspot 2: appears at 4.5, fades at 6.5 (stays longer)
-    tl.to(pointer2InnerRef.current, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 4.5);
-    tl.to(pointer2InnerRef.current, { opacity: 0, scale: 0.95, duration: 0.35, ease: "power1.in" }, 6.5);
+    // Hotspot 2: appears at 7.2, stays longer
+    tl.to(pointer2InnerRef.current, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.4)" }, 7.2);
+    tl.to(pointer2InnerRef.current, { opacity: 0, scale: 0.95, duration: 0.5, ease: "power1.in" }, 10.5);
     
-    // Hotspot 3: appears at 6.8, fades at 7.8
-    revealHotspot(pointer3InnerRef, 6.8);
+    // Hotspot 3: appears at 11
+    revealHotspot(pointer3InnerRef, 11);
     
-    // Hotspot 4: appears at 7.5, fades at 8.5
-    revealHotspot(pointer4InnerRef, 7.5);
+    // Hotspot 4: appears at 12.5
+    revealHotspot(pointer4InnerRef, 12.5);
 
     // Create ScrollTrigger after a small delay to ensure DOM is ready
     const stTimer = setTimeout(() => {
@@ -484,7 +484,7 @@ export function RevealZoom({
         start: "top top",
         end: scrollDistance,
         pin: true,
-        scrub: 0.8,  // Slightly reduced for snappier response
+        scrub: 1,
         onUpdate: (self) => {
           if (!isLockedRef.current && timelineRef.current) {
             timelineRef.current.progress(self.progress);
