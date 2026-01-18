@@ -147,7 +147,7 @@ export function RevealZoom({
   buildingImage = '/images/gateway/reveal.png',
   windowImage = '/images/gateway/mirai.png',
   shapeImage = '/images/gateway/shape-two.png',
-  scrollDistance = "+=550%",  // Balanced: not too slow, not too fast
+  scrollDistance = "+=550%",
   buildingZoomScale = 16,
   windowZoomScale = 2.5,
   windowMoveDistance = 1,
@@ -167,7 +167,7 @@ export function RevealZoom({
   // Inner refs
   const pointer1InnerRef = useRef<HTMLDivElement>(null);
   const pointer2InnerRef = useRef<HTMLDivElement>(null);
-  const pointer3InnerRef = useRef<HTMLDivElement>(null>;
+  const pointer3InnerRef = useRef<HTMLDivElement>(null);
   const pointer4InnerRef = useRef<HTMLDivElement>(null);
   
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
