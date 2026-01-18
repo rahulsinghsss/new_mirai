@@ -359,7 +359,7 @@ export function RevealZoom({
   }, [allImagesLoaded, setupCanvas]);
 
   // ============================================
-  // ANIMATION TIMELINE (Instant transition - overlapping)
+  // ANIMATION TIMELINE (Faster building zoom - window zoom starts sooner)
   // ============================================
   useEffect(() => {
     if (typeof window === 'undefined' || !allImagesLoaded || !isReady) return;
@@ -397,30 +397,30 @@ export function RevealZoom({
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
     timelineRef.current = tl;
 
-    // --- PHASE 1: BUILDING ZOOM (0 - 5.5) ---
-    tl.to(shapeRef.current, { opacity: 0, duration: 1.2, ease: "power1.out" }, 0);
-    tl.to(textRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }, 1.0);
+    // --- PHASE 1: BUILDING ZOOM (0 - 3.5) - SHORTENED ---
+    tl.to(shapeRef.current, { opacity: 0, duration: 0.8, ease: "power1.out" }, 0);
+    tl.to(textRef.current, { opacity: 1, y: 0, duration: 1.0, ease: "power2.out" }, 0.5);
     
     tl.to(buildingRef.current, { 
       scale: buildingZoomScale, 
-      duration: 5.5,
+      duration: 3.5,
       ease: "power1.inOut",
       force3D: true
     }, 0);
 
-    // --- PHASE 2: TRANSITION - Starts slightly before building zoom ends (overlapping) ---
-    tl.to(buildingRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 5.49);
-    tl.to(textRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 5.49);
+    // --- PHASE 2: TRANSITION - Instant ---
+    tl.to(buildingRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 3.49);
+    tl.to(textRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 3.49);
 
-    // --- PHASE 3: WINDOW ZOOM (5.5 - 6.5) - Starts immediately ---
+    // --- PHASE 3: WINDOW ZOOM (3.5 - 4.5) ---
     tl.to(animState.current, {
       scale: windowZoomScale,
       duration: 1.0,
       ease: "power1.inOut",
       onUpdate: scheduleCanvasDraw,
-    }, 5.5);
+    }, 3.5);
 
-    // --- PHASE 4: PAN & HOTSPOTS (6.5 - 14) ---
+    // --- PHASE 4: PAN & HOTSPOTS (4.5 - 12) ---
     tl.to(animState.current, {
       panY: windowMoveDistance,
       duration: 7.5,
@@ -456,7 +456,7 @@ export function RevealZoom({
           if (pointer4Ref.current) pointer4Ref.current.style.transform = transformStyle;
         }
       },
-    }, 6.5);
+    }, 4.5);
 
     // Hotspot reveal helper
     const revealHotspot = (ref: React.RefObject<HTMLDivElement | null>, time: number) => {
@@ -464,18 +464,18 @@ export function RevealZoom({
       tl.to(ref.current, { opacity: 0, scale: 0.95, duration: 0.5, ease: "power1.in" }, time + 1.8);
     };
 
-    // Hotspot 1: appears at 7
-    revealHotspot(pointer1InnerRef, 7);
+    // Hotspot 1: appears at 5
+    revealHotspot(pointer1InnerRef, 5);
     
-    // Hotspot 2: appears at 8, stays longer
-    tl.to(pointer2InnerRef.current, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.4)" }, 8);
-    tl.to(pointer2InnerRef.current, { opacity: 0, scale: 0.95, duration: 0.5, ease: "power1.in" }, 11);
+    // Hotspot 2: appears at 6, stays longer
+    tl.to(pointer2InnerRef.current, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.4)" }, 6);
+    tl.to(pointer2InnerRef.current, { opacity: 0, scale: 0.95, duration: 0.5, ease: "power1.in" }, 9);
     
-    // Hotspot 3: appears at 11.5
-    revealHotspot(pointer3InnerRef, 11.5);
+    // Hotspot 3: appears at 9.5
+    revealHotspot(pointer3InnerRef, 9.5);
     
-    // Hotspot 4: appears at 13
-    revealHotspot(pointer4InnerRef, 13);
+    // Hotspot 4: appears at 11
+    revealHotspot(pointer4InnerRef, 11);
 
     // Create ScrollTrigger after a small delay to ensure DOM is ready
     const stTimer = setTimeout(() => {
