@@ -65,13 +65,14 @@ export default function SixthElement() {
   const h2Style: React.CSSProperties = { ...h2Scroll, ...headingBase, opacity: ((h2Scroll.opacity as number) || 0) * 0.95, fontFamily: 'Migra, sans-serif', color: '#78252f' }
 
   return (
-    <section 
-      ref={sectionRef} 
+    <section
+      ref={sectionRef}
       className="relative w-full overflow-hidden"
-      style={{ 
+      style={{
         backgroundColor: 'transparent',
-        zIndex: 10, 
-        position: 'relative' 
+        zIndex: 10,
+        position: 'relative',
+        marginBottom: '-1px'
       }}
     >
       {/* Background Image: Always opaque to prevent flickering */}
