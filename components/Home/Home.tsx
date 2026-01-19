@@ -142,14 +142,13 @@ const Home = () => {
           {/* SixthElement - transparent background, shows Hero video behind */}
           <SixthElement />
           
-          {/* RevealZoom - negative margin to overlap any white area from SixthElement */}
-          <section 
-            aria-label="Reveal zoom" 
+          {/* RevealZoom - negative margin to overlap any gap from SixthElement */}
+          <section
+            aria-label="Reveal zoom"
             className="relative bg-black"
-            style={{ 
+            style={{
               isolation: 'isolate',
-              marginTop: '-100px',
-              paddingTop: '100px'
+              marginTop: '-2px'
             }}
           >
             <RevealZoom />
