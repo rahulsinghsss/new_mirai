@@ -12,7 +12,8 @@ import MiraiClubhouse from './ClubeHouse_Img_controller/ClubeHouse_Controller'
 import InteractiveMap from './Interative_Map/Interative_Map'
 import ContactForm from './Contact_us/Contact_us'
 import Footer from './Footer/Footer'
-import SixthElement from './Sixth_Element/Sixth_element'
+// Updated import - use the responsive version
+import SixthElementResponsive from './Sixth_Element/SixthElementResponsive'
 
 // Critical images to preload
 const CRITICAL_IMAGES = [
@@ -52,11 +53,10 @@ const Home = () => {
     CRITICAL_IMAGES.forEach((src) => {
       const img = new Image();
       img.onload = checkAllLoaded;
-      img.onerror = checkAllLoaded; // Continue even if image fails
+      img.onerror = checkAllLoaded;
       img.src = src;
     });
 
-    // Fallback - if images take too long, proceed anyway after 3 seconds
     const fallbackTimer = setTimeout(() => {
       setAssetsLoaded(true);
     }, 3000);
@@ -76,7 +76,6 @@ const Home = () => {
     document.documentElement.style.overflow = 'hidden';
 
     const enableScroll = () => {
-      // Wait for window load + small delay
       setTimeout(() => {
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
@@ -102,35 +101,26 @@ const Home = () => {
     setIsPreloaderComplete(true);
   };
 
-  // Wait until session is checked
   if (!hasCheckedSession) {
     return <div className="w-full h-screen bg-black" />;
   }
 
-  // Show preloader if not seen
   if (!isPreloaderComplete) {
     return <VideoPreloader onComplete={handlePreloaderComplete} />;
   }
 
-  // Wait for assets to load
   if (!assetsLoaded) {
     return <div className="w-full h-screen bg-black" />;
   }
 
   return (
     <>
-      {/* Hero is fixed position with video - z-index 2 */}
       <Hero />
-      
-      {/* ContactForm is fixed - z-index 1, only shows when scrolled past 80% */}
       <ContactForm />
       
-      {/* Main scrollable content */}
       <div className="relative w-full overflow-x-hidden">
-        {/* Spacer for Hero section */}
         <div className="h-screen" aria-hidden="true" />
         
-        {/* Content sections - z-index 10, scrolls over Hero */}
         <div 
           className="relative" 
           style={{ 
@@ -139,10 +129,9 @@ const Home = () => {
             transition: 'opacity 0.5s ease'
           }}
         >
-          {/* SixthElement - transparent background, shows Hero video behind */}
-          <SixthElement />
+          {/* Use the responsive version that switches between mobile/desktop */}
+          <SixthElementResponsive />
           
-          {/* RevealZoom - negative margin to overlap any gap from SixthElement */}
           <section
             aria-label="Reveal zoom"
             className="relative bg-black"
@@ -170,14 +159,12 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Spacer to reveal fixed ContactForm - OUTSIDE the z-index 10 container */}
         <div 
           className="h-screen pointer-events-none" 
           aria-hidden="true" 
           style={{ position: 'relative', zIndex: 1 }}
         />
         
-        {/* Footer scrolls over ContactForm */}
         <div style={{ position: 'relative', zIndex: 10 }}>
           <Footer />
         </div>
