@@ -187,7 +187,7 @@ const EraSeasons: React.FC = () => {
     spring: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/terra-w.png',
     summer: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/aqua-w.png',
     autumn: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pyro-w.png',
-    winter: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pyro-w.png'
+    winter: 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods-01.png'
   };
 
   return (
