@@ -34,7 +34,7 @@ export default function SixthElementMobile() {
 
     return {
       opacity: localProgress,
-      transform: `translateY(${(1 - localProgress) * 40}px)`, // Reduced movement for mobile
+      transform: `translateY(${(1 - localProgress) * 40}px)`,
       transition: 'opacity 0.15s linear, transform 0.15s ease-out',
     }
   }
@@ -43,13 +43,13 @@ export default function SixthElementMobile() {
   const h2Scroll = getScrollStyle(0.25, 0.45)
 
   const headingBase: React.CSSProperties = {
-    letterSpacing: '2px', // Reduced for mobile
+    letterSpacing: '2px',
     textRendering: 'optimizeLegibility',
     WebkitFontSmoothing: 'antialiased',
     marginBlock: '.5em',
     marginInline: 0,
     display: 'block',
-    fontSize: '24px', // Smaller for mobile
+    fontSize: '28px', // Increased for better visibility
     fontWeight: 250,
   }
 
@@ -67,7 +67,7 @@ export default function SixthElementMobile() {
     opacity: ((h2Scroll.opacity as number) || 0) * 0.95, 
     fontFamily: 'Migra, sans-serif', 
     color: '#78252f',
-    fontSize: '20px' // Even smaller for subtitle
+    fontSize: '24px'
   }
 
   return (
@@ -78,29 +78,38 @@ export default function SixthElementMobile() {
         backgroundColor: 'transparent',
         zIndex: 10,
         position: 'relative',
-        marginBottom: '-1px'
+        marginBottom: '-1px',
+        minHeight: '100vh', // Full viewport height minimum
       }}
     >
-      {/* Background Image */}
+      {/* Background Image - Now covers full section */}
       <img
         src={bgPath}
         alt="Pavani Mirai Background"
         style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
-          height: 'auto',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
           display: 'block',
           opacity: 1, 
           willChange: 'transform',
         }}
       />
 
-      {/* Text Overlay - Mobile optimized */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-full px-4 text-center text-black" style={{ marginTop: '5%' }}>
+      {/* Text Overlay - Mobile optimized with more vertical space */}
+      <div 
+        className="relative flex items-center justify-center pointer-events-none"
+        style={{ minHeight: '100vh' }}
+      >
+        <div className="w-full px-6 text-center text-black" style={{ paddingTop: '15%', paddingBottom: '15%' }}>
           
           {/* Welcome Header */}
           <h1 
-            className="tracking-wider mb-1 text-black"
+            className="tracking-wider mb-3 text-black"
             style={h1Style}
           >
             Welcome to Pavani Mirai
@@ -108,21 +117,21 @@ export default function SixthElementMobile() {
 
           {/* Main Title */}
           <h2 
-            className="leading-tight mb-4 text-black"
+            className="leading-tight mb-8 text-black"
             style={h2Style}
           >
             Where you Live the <span>Sixth Element</span>
           </h2>
 
-          <div className="w-full mx-auto space-y-3 px-2">
-            {/* Paragraph 1 - Mobile version */}
+          <div className="w-full mx-auto space-y-6 px-4">
+            {/* Paragraph 1 */}
             <p 
               className="leading-relaxed text-black"
               style={{ 
                 ...getScrollStyle(0.35, 0.55), 
-                fontSize: '14px', 
+                fontSize: '16px', 
                 fontWeight: 400,
-                lineHeight: 1.6
+                lineHeight: 1.8
               }}
             >
               Nature crafted five elements — Earth that grounds us. 
@@ -132,14 +141,14 @@ export default function SixthElementMobile() {
               Space that holds us.
             </p>
             
-            {/* Paragraph 2 - Show on mobile too but smaller */}
+            {/* Paragraph 2 */}
             <p 
               className="leading-relaxed text-black"
               style={{ 
                 ...getScrollStyle(0.45, 0.65), 
-                fontSize: '13px', 
+                fontSize: '15px', 
                 fontWeight: 400,
-                lineHeight: 1.5
+                lineHeight: 1.7
               }}
             >
               With Pavani as the catalyst, the sixth element takes shape when all elements unite in serene harmony.
