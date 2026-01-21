@@ -168,11 +168,17 @@ const Home = () => {
             <MiraiClubhouse />
             <InteractiveMap />
           </div>
+        </div>
 
-          {/* Spacer to reveal fixed ContactForm behind - pointer-events-none allows clicking through */}
-          <div className="h-screen pointer-events-none" aria-hidden="true" />
-          
-          {/* Footer scrolls over ContactForm */}
+        {/* Spacer to reveal fixed ContactForm - OUTSIDE the z-index 10 container */}
+        <div 
+          className="h-screen pointer-events-none" 
+          aria-hidden="true" 
+          style={{ position: 'relative', zIndex: 1 }}
+        />
+        
+        {/* Footer scrolls over ContactForm */}
+        <div style={{ position: 'relative', zIndex: 10 }}>
           <Footer />
         </div>
       </div>
