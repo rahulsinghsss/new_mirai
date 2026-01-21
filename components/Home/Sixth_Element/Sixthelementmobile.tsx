@@ -125,7 +125,11 @@ export default function SixthElementMobile() {
                 lineHeight: 1.6
               }}
             >
-              blabla
+              Nature crafted five elements — Earth that grounds us. 
+              Water that nourishes us. 
+              Fire that warms us. 
+              Air that breathes through us. 
+              Space that holds us.
             </p>
             
             {/* Paragraph 2 - Show on mobile too but smaller */}
