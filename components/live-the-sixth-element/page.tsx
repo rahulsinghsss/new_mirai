@@ -23,7 +23,7 @@ export default function MiraiHomesPage() {
   // Preload the sky background image
   useEffect(() => {
     const img = new Image();
-    img.src = "https://azure-baboon-302476.hostingersite.com//mirai_/media/footer_img.png";
+    img.src = "https://d3p1hokpi6aqc3.cloudfront.net/Aminites_Tera_Pods_3.jpg";
     img.onload = () => setSkyImageLoaded(true);
   }, []);
 
@@ -389,3 +389,4 @@ export default function MiraiHomesPage() {
     </main>
   );
 }
+
