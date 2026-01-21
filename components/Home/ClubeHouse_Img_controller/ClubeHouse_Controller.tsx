@@ -48,7 +48,7 @@ const levels: Level[] = [
     amenities: [
       { name: 'Half Olympic Pool', image: 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/level3-one.jpg' },
       { name: 'TT Room', image: 'https://images.unsplash.com/photo-1767344464272-17e1c657f8bf?w=1600&q=80&auto=format' },
-      { name: 'Coworking Space', image: 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/level3-four.jpg' },
+      { name: 'Coworking Space', image: 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/coworkingspace.png' },
       { name: 'Squash Court', image: 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/level3-five.png' },
       { name: 'Badminton Courts', image: 'https://images.unsplash.com/photo-1767437854156-9afa48aeba89?w=1600&q=80&auto=format&fit=crop' },
       { name: 'Conference Arena', image: 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/office-room.jpg' }
