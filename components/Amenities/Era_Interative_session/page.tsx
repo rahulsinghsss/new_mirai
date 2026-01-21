@@ -23,22 +23,20 @@ const EraSeasons: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(true);
 
-
-
   const seasons: Seasons = {
     spring: {
       title: 'TERRA',
       description: '',
       amenities: [
-        { name: 'Outdoor Fitness Zones', image: 'bg-terra-1' },   // 1
-        { name: 'Gathering Zones', image: 'bg-terra-2' },          // 2
-        { name: 'Sandpit Area', image: 'bg-terra-3' },             // 3
-        { name: 'Kids Play Area', image: 'bg-terra-1' },           // 1
-        { name: 'Terrace Lawn', image: 'bg-terra-2' },             // 2
-        { name: 'Ultra-Luxury Lounge', image: 'bg-terra-3' },      // 3
-        { name: 'Biophilic Seating Arena', image: 'bg-terra-1' },  // 1
-        { name: 'Vantage Point', image: 'bg-terra-2' },            // 2
-        { name: 'Yoga Lawn', image: 'bg-terra-3' }                 // 3
+        { name: 'Outdoor Fitness Zones', image: 'bg-terra-1' },
+        { name: 'Gathering Zones', image: 'bg-terra-2' },
+        { name: 'Sandpit Area', image: 'bg-terra-3' },
+        { name: 'Kids Play Area', image: 'bg-terra-1' },
+        { name: 'Terrace Lawn', image: 'bg-terra-2' },
+        { name: 'Ultra-Luxury Lounge', image: 'bg-terra-3' },
+        { name: 'Biophilic Seating Arena', image: 'bg-terra-1' },
+        { name: 'Vantage Point', image: 'bg-terra-2' },
+        { name: 'Yoga Lawn', image: 'bg-terra-3' }
       ],
       bgClass: 'bg-autumn'
     },
@@ -46,14 +44,14 @@ const EraSeasons: React.FC = () => {
       title: 'AQUA',
       description: '',
       amenities: [
-        { name: 'Infinity Swimming Pool', image: 'bg-aqua-1' },                  // 1
-        { name: 'Outdoor Beach Deck with Seating Kiosks', image: 'bg-aqua-2' },  // 2
-        { name: 'Green Islands', image: 'bg-aqua-3' },                           // 3
-        { name: 'Kids Pool', image: 'bg-aqua-4' },                               // 4
-        { name: 'Private Dining Area', image: 'bg-aqua-1' },                     // 1
-        { name: 'Private Bar Counter', image: 'bg-aqua-2' },                     // 2
-        { name: 'Water Pavilion', image: 'bg-aqua-3' },                          // 3
-        { name: 'Vantage Point', image: 'bg-aqua-4' }                            // 4
+        { name: 'Infinity Swimming Pool', image: 'bg-aqua-1' },
+        { name: 'Outdoor Beach Deck with Seating Kiosks', image: 'bg-aqua-2' },
+        { name: 'Green Islands', image: 'bg-aqua-3' },
+        { name: 'Kids Pool', image: 'bg-aqua-4' },
+        { name: 'Private Dining Area', image: 'bg-aqua-1' },
+        { name: 'Private Bar Counter', image: 'bg-aqua-2' },
+        { name: 'Water Pavilion', image: 'bg-aqua-3' },
+        { name: 'Vantage Point', image: 'bg-aqua-4' }
       ],
       bgClass: 'bg-summer'
     },
@@ -61,16 +59,16 @@ const EraSeasons: React.FC = () => {
       title: 'PYRO',
       description: '',
       amenities: [
-        { name: 'Agni-Water Sculptures', image: 'bg-pyro-1' },      // 1
-        { name: 'Ultra-Luxury Lounge', image: 'bg-pyro-2' },        // 2
-        { name: 'Bonfire Arena', image: 'bg-pyro-3' },              // 3
-        { name: 'Barbeque Area', image: 'bg-pyro-1' },              // 1
-        { name: 'Bar Counter/Juice Station', image: 'bg-pyro-2' }, // 2
-        { name: 'Gathering Lawn', image: 'bg-pyro-3' },             // 3
-        { name: 'Lava Walk Zone', image: 'bg-pyro-1' },             // 1
-        { name: 'Flame Seating Pods', image: 'bg-pyro-2' },         // 2
-        { name: 'Senior Citizens Corner', image: 'bg-pyro-3' },     // 3
-        { name: 'Vantage Point', image: 'bg-pyro-1' }               // 1
+        { name: 'Agni-Water Sculptures', image: 'bg-pyro-1' },
+        { name: 'Ultra-Luxury Lounge', image: 'bg-pyro-2' },
+        { name: 'Bonfire Arena', image: 'bg-pyro-3' },
+        { name: 'Barbeque Area', image: 'bg-pyro-1' },
+        { name: 'Bar Counter/Juice Station', image: 'bg-pyro-2' },
+        { name: 'Gathering Lawn', image: 'bg-pyro-3' },
+        { name: 'Lava Walk Zone', image: 'bg-pyro-1' },
+        { name: 'Flame Seating Pods', image: 'bg-pyro-2' },
+        { name: 'Senior Citizens Corner', image: 'bg-pyro-3' },
+        { name: 'Vantage Point', image: 'bg-pyro-1' }
       ],
       bgClass: 'bg-winter'
     },
@@ -78,13 +76,13 @@ const EraSeasons: React.FC = () => {
       title: 'AVIA',
       description: '',
       amenities: [
-        { name: 'Amphitheatre with Advent Seating Zone', image: 'bg-avia-1' },  // 1
-        { name: 'Sculpture Pod', image: 'bg-avia-2' },                           // 2
-        { name: 'Digital Presentation Room', image: 'bg-avia-3' },               // 3
-        { name: 'Meeting Rooms', image: 'bg-avia-1' },                           // 1
-        { name: 'Interactive Water Plaza', image: 'bg-avia-2' },                 // 2
-        { name: 'Bar Counter', image: 'bg-avia-3' },                             // 3
-        { name: 'Vantage Point', image: 'bg-avia-1' }                            // 1
+        { name: 'Amphitheatre with Advent Seating Zone', image: 'bg-avia-1' },
+        { name: 'Sculpture Pod', image: 'bg-avia-2' },
+        { name: 'Digital Presentation Room', image: 'bg-avia-3' },
+        { name: 'Meeting Rooms', image: 'bg-avia-1' },
+        { name: 'Interactive Water Plaza', image: 'bg-avia-2' },
+        { name: 'Bar Counter', image: 'bg-avia-3' },
+        { name: 'Vantage Point', image: 'bg-avia-1' }
       ],
       bgClass: 'bg-spring'
     }
@@ -134,20 +132,16 @@ const EraSeasons: React.FC = () => {
     'bg-avia-amphitheatre': 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/amphi.jpg',
     'bg-avia-vantage': 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/vantage-avia.jpg',
     'bg-aqua-vantage': 'https://pavanimirai.com/55storeys-luxury-apartments-in-financial-district/media/vantage-terra.jpg',
-    // Terra images
     'bg-terra-1': 'https://d3p1hokpi6aqc3.cloudfront.net/Aminites_Tera_Pods_1.png',
     'bg-terra-2': 'https://d3p1hokpi6aqc3.cloudfront.net/Aminites_Tera_Pods_2.png',
     'bg-terra-3': 'https://azure-baboon-302476.hostingersite.com/mirai_latest/media/pods/terravantage.png',
-    // Aqua images
     'bg-aqua-1': 'https://d3p1hokpi6aqc3.cloudfront.net/AQUA%20POD_1.png',
     'bg-aqua-2': 'https://d3p1hokpi6aqc3.cloudfront.net/AQUA%20POD_2.png',
     'bg-aqua-3': 'https://d3p1hokpi6aqc3.cloudfront.net/AQUA%20POD_3.png',
     'bg-aqua-4': 'https://d3p1hokpi6aqc3.cloudfront.net/AQUA%20POD_4.png',
-    // Pyro images
     'bg-pyro-1': 'https://d3p1hokpi6aqc3.cloudfront.net/Pyro_Pod_1.png',
     'bg-pyro-2': 'https://d3p1hokpi6aqc3.cloudfront.net/Pyro_pod_2.png',
     'bg-pyro-3': 'https://d3p1hokpi6aqc3.cloudfront.net/Pyro_Pod_3.png',
-    // Avia images
     'bg-avia-1': 'https://d3p1hokpi6aqc3.cloudfront.net/Avia_%20Pod_1.png',
     'bg-avia-2': 'https://d3p1hokpi6aqc3.cloudfront.net/Avia_Pod_2.png',
     'bg-avia-3': 'https://d3p1hokpi6aqc3.cloudfront.net/Avia_%20Pod_3.png'
@@ -193,18 +187,39 @@ const EraSeasons: React.FC = () => {
   return (
     <section className="w-screen h-screen overflow-hidden relative m-0 p-0 max-w-full">
       <div className="relative w-full h-full flex items-center justify-center">
-        {/* Background Image */}
+        {/* Blurred Background Fill Layer - prevents empty space */}
         <div 
-          className={`absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-700 ${
-            isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+          className={`absolute inset-0 w-full h-full transition-all duration-700 ${
+            isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}
           style={{ 
             backgroundImage: `url(${currentBgImage})`,
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat'
+            backgroundRepeat: 'no-repeat',
+            filter: 'blur(30px)',
+            transform: 'scale(1.1)'
           }}
         />
+
+        {/* Main Background Image - Full image without cropping */}
+        <div 
+          className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-700 ${
+            isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+          }`}
+        >
+          <img
+            src={currentBgImage}
+            alt="Background"
+            className="max-w-full max-h-full w-auto h-auto object-contain"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              width: 'auto',
+              height: 'auto'
+            }}
+          />
+        </div>
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
