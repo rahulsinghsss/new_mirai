@@ -1,114 +1,183 @@
-'use client'
+'use client';
 
-import React, { useRef, useEffect } from 'react'
-import Image from 'next/image'
-const HERO_LOGO = '/images/logo_1.png'
+import React, { useEffect, useState } from 'react'
+import VideoPreloader from './Preloader/Preloader'
+import Hero from './Hero/Hero'
+import { RevealZoom } from './Gateway/Gateway' 
+import Mirai_Grace from './Mirai_Grace/Mirai_Grace'
+import MiraiPodsIntro from './4_Pods/4_pods'
+import MiraiPodsSlider from './Mirai_Pods_Slider/Pods_Slider'
+import ClubhouseIntro from './4_Level_Clubhouse/4_Level_Clubhouse'
+import MiraiClubhouse from './ClubeHouse_Img_controller/ClubeHouse_Controller'
+import InteractiveMap from './Interative_Map/Interative_Map'
+import ContactForm from './Contact_us/Contact_us'
+import Footer from './Footer/Footer'
+import SixthElement from './Sixth_Element/Sixth_element'
 
-const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const gsapRef = useRef<any>(null)
-  const [videoReady, setVideoReady] = React.useState(false)
-  const [isHidden, setIsHidden] = React.useState(false)
+// Critical images to preload
+const CRITICAL_IMAGES = [
+  '/images/logo_1.png',
+  '/images/sixth_ment.png',
+  '/images/gateway/reveal.png',
+  '/images/gateway/mirai.png',
+  '/images/gateway/shape-two.png',
+];
 
+const Home = () => {
+  const [isPreloaderComplete, setIsPreloaderComplete] = useState(false);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const [isPageReady, setIsPageReady] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+
+  // Check session and preload critical assets
   useEffect(() => {
-    if (!videoRef.current) return
-    videoRef.current.play().catch(() => {})
-  }, [])
+    const hasSeenPreloader = sessionStorage.getItem('preloaderShown');
+    
+    if (hasSeenPreloader) {
+      setIsPreloaderComplete(true);
+    }
+    setHasCheckedSession(true);
 
-  const handleCanPlay = () => {
-    if (videoRef.current) videoRef.current.play().catch(() => {})
-  }
+    // Preload critical images
+    let loadedCount = 0;
+    const totalImages = CRITICAL_IMAGES.length;
 
+    const checkAllLoaded = () => {
+      loadedCount++;
+      if (loadedCount >= totalImages) {
+        setAssetsLoaded(true);
+      }
+    };
+
+    CRITICAL_IMAGES.forEach((src) => {
+      const img = new Image();
+      img.onload = checkAllLoaded;
+      img.onerror = checkAllLoaded; // Continue even if image fails
+      img.src = src;
+    });
+
+    // Fallback - if images take too long, proceed anyway after 3 seconds
+    const fallbackTimer = setTimeout(() => {
+      setAssetsLoaded(true);
+    }, 3000);
+
+    return () => clearTimeout(fallbackTimer);
+  }, []);
+
+  // Disable scrolling until page is ready
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    Promise.all([import('gsap'), import('gsap/ScrollToPlugin')])
-      .then(([gsapModule, scrollModule]) => {
-        const gsap = gsapModule.gsap || gsapModule.default || gsapModule
-        const ScrollToPlugin = scrollModule.ScrollToPlugin || scrollModule.default || scrollModule
-        try { gsap.registerPlugin(ScrollToPlugin) } catch(e) {}
-        gsapRef.current = gsap
-      })
-  }, [])
-
-  // Hide hero when scrolled near the bottom of the page
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-
-      // Hide the hero video once the user scrolls past the hero section
-      setIsHidden(scrollY >= windowHeight - 5)
+    if (!isPreloaderComplete || !assetsLoaded) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      return;
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Initial check
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
 
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    const enableScroll = () => {
+      // Wait for window load + small delay
+      setTimeout(() => {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        setIsPageReady(true);
+      }, 500);
+    };
 
-  const fullScreenMediaStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: '101%', 
-    height: '101%',
-    transform: 'translate(-50%, -50%)',
-    objectFit: 'cover',
-    display: 'block',
-    zIndex: 1,
-    backfaceVisibility: 'hidden',
-    WebkitBackfaceVisibility: 'hidden'
+    if (document.readyState === 'complete') {
+      enableScroll();
+    } else {
+      window.addEventListener('load', enableScroll);
+      return () => window.removeEventListener('load', enableScroll);
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isPreloaderComplete, assetsLoaded]);
+
+  const handlePreloaderComplete = () => {
+    sessionStorage.setItem('preloaderShown', 'true');
+    setIsPreloaderComplete(true);
   };
 
-  return (
-    <section style={{ 
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100vh', 
-      backgroundColor: '#000',
-      overflow: 'hidden', 
-      margin: 0,
-      padding: 0,
-      zIndex: 0, // lower z-index so page content can overlap on scroll
-      pointerEvents: 'none', // allow interactions with overlapping content
-      opacity: isHidden ? 0 : 1,
-      visibility: isHidden ? 'hidden' : 'visible',
-      transition: 'opacity 0.4s ease, visibility 0.4s ease'
-    }}>
-      {/* Logo - top center */}
-      <div style={{ position: 'absolute', left: 0, top: 40, width: '100%', zIndex: 10, pointerEvents: 'none' }} aria-hidden="true">
-        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <div style={{ height: '1px', background: '#fff', opacity: 0.9, flex: 1 }} />
+  // Wait until session is checked
+  if (!hasCheckedSession) {
+    return <div className="w-full h-screen bg-black" />;
+  }
 
-          <div style={{ padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Image src={HERO_LOGO} alt="Mirai logo" width={240} height={88} style={{ height: 'auto', display: 'block' }} priority unoptimized />
+  // Show preloader if not seen
+  if (!isPreloaderComplete) {
+    return <VideoPreloader onComplete={handlePreloaderComplete} />;
+  }
+
+  // Wait for assets to load
+  if (!assetsLoaded) {
+    return <div className="w-full h-screen bg-black" />;
+  }
+
+  return (
+    <>
+      {/* Hero is fixed position with video - z-index 2 */}
+      <Hero />
+      
+      {/* ContactForm is fixed - z-index 1, only shows when scrolled past 80% */}
+      <ContactForm />
+      
+      {/* Main scrollable content */}
+      <div className="relative w-full overflow-x-hidden">
+        {/* Spacer for Hero section */}
+        <div className="h-screen" aria-hidden="true" />
+        
+        {/* Content sections - z-index 10, scrolls over Hero */}
+        <div 
+          className="relative" 
+          style={{ 
+            zIndex: 10,
+            opacity: isPageReady ? 1 : 0,
+            transition: 'opacity 0.5s ease'
+          }}
+        >
+          {/* SixthElement - transparent background, shows Hero video behind */}
+          <SixthElement />
+          
+          {/* RevealZoom - negative margin to overlap any gap from SixthElement */}
+          <section
+            aria-label="Reveal zoom"
+            className="relative bg-black"
+            style={{
+              isolation: 'isolate',
+              marginTop: '-2px'
+            }}
+          >
+            <RevealZoom />
+          </section>
+          
+          <section 
+            aria-label="Scroll video" 
+            className="relative bg-black"
+          >
+            <Mirai_Grace />
+          </section>
+          
+          <div className="relative bg-black">
+            <MiraiPodsIntro />
+            <MiraiPodsSlider />
+            <ClubhouseIntro />
+            <MiraiClubhouse />
+            <InteractiveMap />
           </div>
 
-          <div style={{ height: '1px', background: '#fff', opacity: 0.9, flex: 1 }} />
+          {/* Spacer to reveal fixed ContactForm behind */}
+          <div className="h-screen" aria-hidden="true" />
+          
+          {/* Footer scrolls over ContactForm */}
+          <Footer />
         </div>
       </div>
-
-      {/* Video Background */}
-      <video
-        ref={videoRef}
-        style={{ ...fullScreenMediaStyle, opacity: videoReady ? 1 : 0, transition: 'opacity 300ms ease' }}
-        crossOrigin="anonymous"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onCanPlay={() => { handleCanPlay(); setVideoReady(true); }}
-        onLoadedData={() => setVideoReady(true)}
-      >
-        <source src="/videos/mirai_home_1.mp4" type="video/mp4" />
-      </video>
-    </section>
+    </>
   )
 }
 
-export default Hero
+export default Home
