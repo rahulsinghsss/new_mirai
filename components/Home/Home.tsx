@@ -6,13 +6,12 @@ import Hero from './Hero/Hero'
 import { RevealZoom } from './Gateway/Gateway' 
 import Mirai_Grace from './Mirai_Grace/Mirai_Grace'
 import MiraiPodsIntro from './4_Pods/4_pods'
-import MiraiPodsSlider from './Mirai_Pods_Slider/Pods_Slider'
+import MiraiPodsSliderResponsive from './Mirai_Pods_Slider/Pods_Slider_Responsive'
 import ClubhouseIntro from './4_Level_Clubhouse/4_Level_Clubhouse'
 import MiraiClubhouse from './ClubeHouse_Img_controller/ClubeHouse_Controller'
 import InteractiveMap from './Interative_Map/Interative_Map'
 import ContactForm from './Contact_us/Contact_us'
 import Footer from './Footer/Footer'
-// Updated import - use the responsive version
 import SixthElementResponsive from './Sixth_Element/Sixthelementresponsive'
 
 // Critical images to preload
@@ -152,7 +151,8 @@ const Home = () => {
           
           <div className="relative bg-black">
             <MiraiPodsIntro />
-            <MiraiPodsSlider />
+            {/* Updated to use responsive slider */}
+            <MiraiPodsSliderResponsive />
             <ClubhouseIntro />
             <MiraiClubhouse />
             <InteractiveMap />
