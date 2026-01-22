@@ -198,8 +198,8 @@ export function RevealZoomMobile({
   buildingImage = '/images/gateway/girlmobile.png',
   windowImage = '/images/gateway/Buildingmobile.png',
   shapeImage = '/images/gateway/shape-two.png',
-  scrollDistance = "+=500%", // Shorter scroll for mobile
-  buildingZoomScale = 12, // Slightly less zoom for mobile
+  scrollDistance = "+=500%",
+  buildingZoomScale = 12,
   windowZoomScale = 2.0,
   windowMoveDistance = 0.8,
 }: ZoomRevealProps) {
@@ -225,7 +225,6 @@ export function RevealZoomMobile({
   const needsDrawRef = useRef(false);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
-  const isLockedRef = useRef(true);
   
   const [isReady, setIsReady] = useState(false);
   const [allImagesLoaded, setAllImagesLoaded] = useState(false);
@@ -248,35 +247,12 @@ export function RevealZoomMobile({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
-    
-    isLockedRef.current = true;
-    
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 100);
     
     return () => clearTimeout(timer);
   }, []);
-
-  // Unlock scroll on user interaction
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isReady) return;
-    
-    const unlock = () => { 
-      isLockedRef.current = false; 
-    };
-    
-    window.addEventListener('wheel', unlock, { passive: true, once: true });
-    window.addEventListener('touchstart', unlock, { passive: true, once: true });
-    
-    return () => {
-      window.removeEventListener('wheel', unlock);
-      window.removeEventListener('touchstart', unlock);
-    };
-  }, [isReady]);
 
   // Preload all images
   useEffect(() => {
@@ -462,7 +438,7 @@ export function RevealZoomMobile({
     // PHASE 4: PAN & HOTSPOTS (3.5 - 9)
     tl.to(animState.current, {
       panY: windowMoveDistance,
-      duration: 5.5, // Shorter duration for mobile
+      duration: 5.5,
       ease: "sine.inOut",
       onUpdate: () => {
         scheduleCanvasDraw();
@@ -497,28 +473,28 @@ export function RevealZoomMobile({
       },
     }, 3.5);
 
-    // Hotspot reveals for mobile - longer visibility
+    // Hotspot reveals for mobile
     const revealHotspot = (ref: React.RefObject<HTMLDivElement | null>, time: number, duration: number = 2.0) => {
       tl.to(ref.current, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" }, time);
       tl.to(ref.current, { opacity: 0, scale: 0.95, duration: 0.4, ease: "power1.in" }, time + duration);
     };
 
-    // Hotspots with adjusted timing for mobile
     revealHotspot(pointer1InnerRef, 3.8, 1.8);
     revealHotspot(pointer2InnerRef, 5.0, 2.5);
     revealHotspot(pointer3InnerRef, 7.0, 1.8);
     revealHotspot(pointer4InnerRef, 8.2, 1.8);
 
-    // ScrollTrigger with touch optimization
+    // ScrollTrigger - optimized for touch
     const stTimer = setTimeout(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: wrapperRef.current,
         start: "top top",
         end: scrollDistance,
         pin: true,
-        scrub: 1.5, // Slightly faster response for mobile touch
+        scrub: 0.8, // Faster response for smoother touch scrolling
+        anticipatePin: 1,
         onUpdate: (self) => {
-          if (!isLockedRef.current && timelineRef.current) {
+          if (timelineRef.current) {
             timelineRef.current.progress(self.progress);
           }
         }
@@ -553,12 +529,42 @@ export function RevealZoomMobile({
         minHeight: '100vh', 
         zIndex: 50,
         opacity: allImagesLoaded ? 1 : 0,
-        transition: 'opacity 0.3s ease'
+        transition: 'opacity 0.3s ease',
+        touchAction: 'pan-y', // Enable vertical touch scrolling
       }}
     >
       <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
         
-        {/* Shape Overlay */}
+        {/* Layer 1: Window/Canvas - BACKGROUND (visible through transparent building) */}
+        <canvas 
+          ref={canvasRef} 
+          className="absolute inset-0 w-full h-full" 
+          style={{ zIndex: 1 }} 
+        />
+
+        {/* Layer 2: Building Image - FOREGROUND with transparency */}
+        <div 
+          className="absolute inset-0 w-full h-full pointer-events-none" 
+          style={{ zIndex: 10 }}
+        >
+          <img
+            ref={buildingRef}
+            src={resolvedBuildingSrc}
+            alt="Building View"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ 
+              willChange: 'transform, opacity', 
+              backfaceVisibility: 'hidden', 
+              transform: 'translateZ(0)',
+              // If your building image has transparent areas, the canvas will show through
+              // If it's fully opaque, you can add a blend mode or reduce opacity slightly:
+              // mixBlendMode: 'multiply', // or 'overlay', 'screen' etc.
+            }}
+          />
+        </div>
+
+        {/* Layer 3: Shape Overlay */}
         <img
           ref={shapeRef}
           src={resolvedShapeSrc}
@@ -573,15 +579,8 @@ export function RevealZoomMobile({
             backfaceVisibility: 'hidden' 
           }}
         />
-        
-        {/* Main Canvas */}
-        <canvas 
-          ref={canvasRef} 
-          className="absolute inset-0 w-full h-full" 
-          style={{ zIndex: 1 }} 
-        />
 
-        {/* MOBILE HOTSPOTS - Adjusted positions */}
+        {/* MOBILE HOTSPOTS */}
         <div ref={pointer1Ref} className="absolute" style={{ zIndex: 20, top: '25%', right: '20%', willChange: 'transform' }}>
           <div ref={pointer1InnerRef} className="opacity-0 scale-90 origin-center">
             <MobileHotspot 
@@ -627,7 +626,7 @@ export function RevealZoomMobile({
         </div>
 
         {/* Floating Text - Mobile optimized */}
-        <div ref={textRef} className="absolute top-6 right-4 left-4" style={{ zIndex: 5 }}>
+        <div ref={textRef} className="absolute top-6 right-4 left-4" style={{ zIndex: 15 }}>
           <h2 
             className="text-white leading-tight tracking-tight uppercase text-center"
             style={{ 
@@ -641,68 +640,7 @@ export function RevealZoomMobile({
             In Your Element
           </h2>
         </div>
-
-        {/* Initial Building View */}
-        <div className="absolute inset-0 w-full h-full" style={{ zIndex: 10 }}>
-          <img
-            ref={buildingRef}
-            src={resolvedBuildingSrc}
-            alt="Building View"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ 
-              willChange: 'transform, opacity', 
-              backfaceVisibility: 'hidden', 
-              transform: 'translateZ(0)' 
-            }}
-          />
-        </div>
       </div>
-
-      {/* Scroll hint for mobile */}
-      <div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        style={{
-          zIndex: 60,
-          opacity: 0.6,
-          animation: 'pulse 2s ease-in-out infinite',
-        }}
-      >
-        <div 
-          style={{
-            width: '24px',
-            height: '40px',
-            border: '2px solid rgba(255,255,255,0.5)',
-            borderRadius: '12px',
-            position: 'relative',
-          }}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              top: '8px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '4px',
-              height: '8px',
-              backgroundColor: 'rgba(255,255,255,0.7)',
-              borderRadius: '2px',
-              animation: 'scrollDown 1.5s ease-in-out infinite',
-            }}
-          />
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes scrollDown {
-          0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
-          50% { opacity: 0.3; transform: translateX(-50%) translateY(10px); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 0.3; }
-        }
-      `}</style>
     </section>
   );
 }
