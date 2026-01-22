@@ -73,7 +73,7 @@ export default function SixthElementMobile() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        minHeight: '200vh',
+        minHeight: '100vh',
         width: '100%',
         overflow: 'hidden',
       }}
