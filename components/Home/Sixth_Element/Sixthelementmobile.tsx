@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
-const bgPath = '/images/sixth_ment_mobile'
+const bgPath = '/images/sixth_ment_mobile.png'
 
 export default function SixthElementMobile() {
   const sectionRef = useRef<HTMLDivElement | null>(null)
