@@ -291,21 +291,25 @@ export function RevealZoomMobile({
     
   }, [isReady, resolvedWindowSrc, resolvedBuildingSrc, resolvedShapeSrc]);
 
-  // Canvas Drawing
-  const drawCanvas = useCallback(() => {
+  // Canvas Drawing - force parameter skips optimization check for initial draw
+  const drawCanvas = useCallback((force: boolean = false) => {
     const canvas = canvasRef.current;
     const ctx = canvasCtxRef.current;
     const img = imageRef.current;
     if (!canvas || !ctx || !img) return;
 
     const { scale, panY, lastScale, lastPanY } = animState.current;
-    if (Math.abs(scale - lastScale) < 0.001 && Math.abs(panY - lastPanY) < 0.001) return;
+    
+    // Skip optimization check if force is true (for initial draw)
+    if (!force && Math.abs(scale - lastScale) < 0.001 && Math.abs(panY - lastPanY) < 0.001) return;
     
     animState.current.lastScale = scale;
     animState.current.lastPanY = panY;
 
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
+    
+    if (displayWidth === 0 || displayHeight === 0) return;
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -333,7 +337,7 @@ export function RevealZoomMobile({
     needsDrawRef.current = true;
     rafIdRef.current = requestAnimationFrame(() => {
       needsDrawRef.current = false;
-      drawCanvas();
+      drawCanvas(false);
     });
   }, [drawCanvas]);
 
@@ -342,6 +346,8 @@ export function RevealZoomMobile({
     if (!canvas) return;
     
     const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    
     canvas.width = rect.width;
     canvas.height = rect.height;
     
@@ -351,14 +357,21 @@ export function RevealZoomMobile({
       ctx.imageSmoothingQuality = 'medium';
       canvasCtxRef.current = ctx;
     }
-    drawCanvas();
+    // Force draw on setup
+    drawCanvas(true);
   }, [drawCanvas]);
 
+  // Force initial canvas draw when images are loaded
   useEffect(() => {
-    if (allImagesLoaded) {
-      setupCanvas();
+    if (allImagesLoaded && imageRef.current && canvasRef.current) {
+      // Small delay to ensure canvas is properly sized
+      const timer = setTimeout(() => {
+        setupCanvas();
+        drawCanvas(true);
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [allImagesLoaded, setupCanvas]);
+  }, [allImagesLoaded, setupCanvas, drawCanvas]);
 
   // Handle Resize
   useEffect(() => {
@@ -535,14 +548,31 @@ export function RevealZoomMobile({
     >
       <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
         
+        {/* Layer 0: Window Image as fallback (ensures visibility even if canvas fails) */}
+        <img
+          src={resolvedWindowSrc}
+          alt="Window Background"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ 
+            zIndex: 0,
+            opacity: allImagesLoaded ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+        
         {/* Layer 1: Window/Canvas - BACKGROUND (visible through transparent building) */}
         <canvas 
           ref={canvasRef} 
           className="absolute inset-0 w-full h-full" 
-          style={{ zIndex: 1 }} 
+          style={{ 
+            zIndex: 1,
+            backgroundColor: 'transparent',
+          }} 
         />
 
-        {/* Layer 2: Building Image - FOREGROUND with transparency */}
+        {/* Layer 2: Building Image - FOREGROUND */}
+        {/* The building will show the window behind it */}
         <div 
           className="absolute inset-0 w-full h-full pointer-events-none" 
           style={{ zIndex: 10 }}
@@ -557,9 +587,10 @@ export function RevealZoomMobile({
               willChange: 'transform, opacity', 
               backfaceVisibility: 'hidden', 
               transform: 'translateZ(0)',
-              // If your building image has transparent areas, the canvas will show through
-              // If it's fully opaque, you can add a blend mode or reduce opacity slightly:
-              // mixBlendMode: 'multiply', // or 'overlay', 'screen' etc.
+              // Window will show through. Options:
+              // 1. If your PNG has alpha transparency - remove opacity below
+              // 2. If your PNG is opaque - keep opacity for visibility
+              // opacity: 0.9, // Uncomment if PNG is fully opaque
             }}
           />
         </div>
