@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import VideoPreloader from './Preloader/Preloader'
 import Hero from './Hero/Hero'
-import { RevealZoom } from './Gateway/Gateway' 
+import GatewayResponsive from './Gateway/Gateway_Responsive'
 import Mirai_Grace from './Mirai_Grace/Mirai_Grace'
 import MiraiPodsIntro from './4_Pods/4_pods'
-import MiraiPodsSliderResponsive from './Mirai_Pods_Slider/Pods_Slider_Responsive'
+import MiraiPodsSlider from './Mirai_Pods_Slider/Pods_Slider'
 import ClubhouseIntro from './4_Level_Clubhouse/4_Level_Clubhouse'
 import MiraiClubhouse from './ClubeHouse_Img_controller/ClubeHouse_Controller'
 import InteractiveMap from './Interative_Map/Interative_Map'
@@ -139,7 +139,8 @@ const Home = () => {
               marginTop: '-2px'
             }}
           >
-            <RevealZoom />
+            {/* Updated to use responsive Gateway */}
+            <GatewayResponsive />
           </section>
           
           <section 
@@ -151,8 +152,7 @@ const Home = () => {
           
           <div className="relative bg-black">
             <MiraiPodsIntro />
-            {/* Updated to use responsive slider */}
-            <MiraiPodsSliderResponsive />
+            <MiraiPodsSlider />
             <ClubhouseIntro />
             <MiraiClubhouse />
             <InteractiveMap />
