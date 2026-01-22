@@ -99,7 +99,7 @@ export default function SixthElementMobile() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 40%',
+            objectPosition: 'center top',
             zIndex: 1,
           }}
         />
