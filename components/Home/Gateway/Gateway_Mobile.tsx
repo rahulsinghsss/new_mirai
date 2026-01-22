@@ -316,20 +316,35 @@ export function RevealZoomMobile({
     const imgAspect = img.naturalWidth / img.naturalHeight;
     const canvasAspect = displayWidth / displayHeight;
     
-    let drawWidth: number, drawHeight: number;
+    // Calculate base size to cover the canvas
+    let baseWidth: number, baseHeight: number;
     if (imgAspect > canvasAspect) {
-      drawHeight = displayHeight * scale;
-      drawWidth = drawHeight * imgAspect;
+      // Image is wider - fit by height
+      baseHeight = displayHeight;
+      baseWidth = baseHeight * imgAspect;
     } else {
-      drawWidth = displayWidth * scale;
-      drawHeight = drawWidth / imgAspect;
+      // Image is taller - fit by width
+      baseWidth = displayWidth;
+      baseHeight = baseWidth / imgAspect;
     }
-
-    const drawX = Math.floor((displayWidth - drawWidth) / 2);
+    
+    // Apply scale - zoom towards center
+    const drawWidth = baseWidth * scale;
+    const drawHeight = baseHeight * scale;
+    
+    // Center the image horizontally and vertically
+    const drawX = (displayWidth - drawWidth) / 2;
+    const drawY = (displayHeight - drawHeight) / 2;
+    
+    // Apply vertical pan offset (for scrolling down the building)
     const extraHeight = drawHeight - displayHeight;
-    const drawY = Math.floor(-extraHeight * panY);
+    const panOffset = extraHeight * panY;
 
-    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, drawX, drawY, drawWidth, drawHeight);
+    ctx.drawImage(
+      img, 
+      0, 0, img.naturalWidth, img.naturalHeight, 
+      drawX, drawY - panOffset, drawWidth, drawHeight
+    );
   }, []);
 
   const scheduleCanvasDraw = useCallback(() => {
@@ -459,21 +474,25 @@ export function RevealZoomMobile({
         if (canvasRef.current && imageRef.current) {
           const canvas = canvasRef.current;
           const img = imageRef.current;
+          const displayWidth = canvas.clientWidth;
           const displayHeight = canvas.clientHeight;
           const scale = animState.current.scale;
           const panY = animState.current.panY;
           
           const imgAspect = img.naturalWidth / img.naturalHeight;
-          const canvasAspect = canvas.clientWidth / displayHeight;
+          const canvasAspect = displayWidth / displayHeight;
           
-          let drawHeight: number;
+          // Match the drawCanvas calculation
+          let baseWidth: number, baseHeight: number;
           if (imgAspect > canvasAspect) {
-            drawHeight = displayHeight * scale;
+            baseHeight = displayHeight;
+            baseWidth = baseHeight * imgAspect;
           } else {
-            const drawWidth = canvas.clientWidth * scale;
-            drawHeight = drawWidth / imgAspect;
+            baseWidth = displayWidth;
+            baseHeight = baseWidth / imgAspect;
           }
           
+          const drawHeight = baseHeight * scale;
           const extraHeight = drawHeight - displayHeight;
           const panOffset = extraHeight * panY;
           
@@ -553,11 +572,16 @@ export function RevealZoomMobile({
           src={resolvedWindowSrc}
           alt="Window Background"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute w-full h-full"
           style={{ 
             zIndex: 0,
             opacity: allImagesLoaded ? 1 : 0,
             transition: 'opacity 0.3s ease',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
         
