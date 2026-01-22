@@ -222,7 +222,6 @@ export function RevealZoomMobile({
   
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const rafIdRef = useRef<number | null>(null);
-  const needsDrawRef = useRef(false);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   
@@ -348,11 +347,12 @@ export function RevealZoomMobile({
   }, []);
 
   const scheduleCanvasDraw = useCallback(() => {
-    if (needsDrawRef.current) return;
-    needsDrawRef.current = true;
+    // Cancel any pending frame to ensure we use latest state
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+    }
     rafIdRef.current = requestAnimationFrame(() => {
-      needsDrawRef.current = false;
-      drawCanvas(false);
+      drawCanvas(true);
     });
   }, [drawCanvas]);
 
@@ -451,9 +451,9 @@ export function RevealZoomMobile({
       force3D: true
     }, 0);
 
-    // PHASE 2: TRANSITION
-    tl.to(buildingRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 2.49);
-    tl.to(textRef.current, { opacity: 0, duration: 0.01, ease: "none" }, 2.49);
+    // PHASE 2: TRANSITION - smoother crossfade
+    tl.to(buildingRef.current, { opacity: 0, duration: 0.3, ease: "power1.inOut" }, 2.2);
+    tl.to(textRef.current, { opacity: 0, duration: 0.3, ease: "power1.inOut" }, 2.2);
 
     // PHASE 3: WINDOW ZOOM (2.5 - 3.5)
     tl.to(animState.current, {
@@ -461,6 +461,12 @@ export function RevealZoomMobile({
       duration: 1.0,
       ease: "sine.inOut",
       onUpdate: scheduleCanvasDraw,
+      onReverseComplete: () => {
+        // Reset scale when fully reversed back
+        animState.current.scale = 1;
+        animState.current.panY = 0;
+        scheduleCanvasDraw();
+      }
     }, 2.5);
 
     // PHASE 4: PAN & HOTSPOTS (3.5 - 9)
@@ -516,18 +522,21 @@ export function RevealZoomMobile({
     revealHotspot(pointer3InnerRef, 7.0, 1.8);
     revealHotspot(pointer4InnerRef, 8.2, 1.8);
 
-    // ScrollTrigger - optimized for touch
+    // ScrollTrigger - optimized for smooth bidirectional touch scrolling
     const stTimer = setTimeout(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: wrapperRef.current,
         start: "top top",
         end: scrollDistance,
         pin: true,
-        scrub: 0.8, // Faster response for smoother touch scrolling
+        scrub: 0.5, // Small value for responsive but smooth scrolling
         anticipatePin: 1,
         onUpdate: (self) => {
           if (timelineRef.current) {
+            // Direct progress update for smooth reverse scrolling
             timelineRef.current.progress(self.progress);
+            // Force canvas redraw on every update
+            scheduleCanvasDraw();
           }
         }
       });
@@ -562,7 +571,6 @@ export function RevealZoomMobile({
         zIndex: 50,
         opacity: allImagesLoaded ? 1 : 0,
         transition: 'opacity 0.3s ease',
-        touchAction: 'pan-y', // Enable vertical touch scrolling
       }}
     >
       <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
