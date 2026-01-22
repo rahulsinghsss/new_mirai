@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
 }
 
 // ============================================
-// 1. Mobile Hotspot Component (Tap to expand)
+// 1. Mobile Hotspot Component
 // ============================================
 interface HotspotProps {
   title: string;
@@ -57,7 +57,6 @@ function MobileHotspot({ title, subtitle, description, position }: HotspotProps)
         transform: 'translateZ(0)',
       }} 
     >
-      {/* Tap Target Circle */}
       <button 
         onClick={handleTap}
         className="relative z-20 flex items-center justify-center shrink-0"
@@ -86,7 +85,6 @@ function MobileHotspot({ title, subtitle, description, position }: HotspotProps)
         </svg>
       </button>
 
-      {/* Label (visible when collapsed) */}
       <div 
         style={{
           marginTop: '8px',
@@ -120,7 +118,6 @@ function MobileHotspot({ title, subtitle, description, position }: HotspotProps)
         </p>
       </div>
       
-      {/* Expanded Card */}
       <div 
         style={{
           position: 'absolute',
@@ -242,37 +239,24 @@ export function RevealZoomMobile({
   const resolvedWindowSrc = typeof windowImage === 'string' ? windowImage : windowImage.src;
   const resolvedShapeSrc = typeof shapeImage === 'string' ? shapeImage : shapeImage.src;
 
-  // Initialize on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    
+    const timer = setTimeout(() => { setIsReady(true); }, 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Preload all images
   useEffect(() => {
     if (!isReady) return;
-    
     let loadedCount = 0;
     const totalImages = 3;
-    
     const checkAllLoaded = () => {
       loadedCount++;
-      if (loadedCount >= totalImages) {
-        setAllImagesLoaded(true);
-      }
+      if (loadedCount >= totalImages) setAllImagesLoaded(true);
     };
     
     const windowImg = new Image();
     windowImg.decoding = 'async';
-    windowImg.onload = () => {
-      imageRef.current = windowImg;
-      checkAllLoaded();
-    };
+    windowImg.onload = () => { imageRef.current = windowImg; checkAllLoaded(); };
     windowImg.onerror = checkAllLoaded;
     windowImg.src = resolvedWindowSrc;
     
@@ -287,10 +271,9 @@ export function RevealZoomMobile({
     shapeImg.onload = checkAllLoaded;
     shapeImg.onerror = checkAllLoaded;
     shapeImg.src = resolvedShapeSrc;
-    
   }, [isReady, resolvedWindowSrc, resolvedBuildingSrc, resolvedShapeSrc]);
 
-  // Canvas Drawing - force parameter skips optimization check for initial draw
+  // Canvas Drawing
   const drawCanvas = useCallback((force: boolean = false) => {
     const canvas = canvasRef.current;
     const ctx = canvasCtxRef.current;
@@ -298,8 +281,6 @@ export function RevealZoomMobile({
     if (!canvas || !ctx || !img) return;
 
     const { scale, panY, lastScale, lastPanY } = animState.current;
-    
-    // Skip optimization check if force is true (for initial draw)
     if (!force && Math.abs(scale - lastScale) < 0.001 && Math.abs(panY - lastPanY) < 0.001) return;
     
     animState.current.lastScale = scale;
@@ -315,33 +296,34 @@ export function RevealZoomMobile({
     const imgAspect = img.naturalWidth / img.naturalHeight;
     const canvasAspect = displayWidth / displayHeight;
     
-    // Calculate base size to cover the canvas
     let baseWidth: number, baseHeight: number;
     if (imgAspect > canvasAspect) {
-      // Image is wider - fit by height
       baseHeight = displayHeight;
       baseWidth = baseHeight * imgAspect;
     } else {
-      // Image is taller - fit by width
       baseWidth = displayWidth;
       baseHeight = baseWidth / imgAspect;
     }
     
-    // Apply scale - zoom towards center
     const drawWidth = baseWidth * scale;
     const drawHeight = baseHeight * scale;
     
-    // Shift image to the right only when zooming (scale > 1)
-    // The shift increases as we zoom in
+    // Zoom/Pan X Logic
     const zoomProgress = Math.max(0, (scale - 1) / (windowZoomScale - 1));
-    const rightShift = displayWidth * 0.15 * zoomProgress; // Gradually shift right as zoom increases
+    const rightShift = displayWidth * 0.15 * zoomProgress;
     const drawX = ((displayWidth - drawWidth) / 2) + rightShift;
     
-    // Start cropped from top (showing upper portion), pan down to reveal bottom
+    // =========================================================================
+    // UPDATED Y-AXIS LOGIC (Crop from top)
+    // =========================================================================
+    
+    // Calculate how much taller the image is than the screen
     const extraHeight = drawHeight - displayHeight;
-    const topCropOffset = extraHeight * 0.3; // Start 30% cropped from top
-    const panOffset = (extraHeight - topCropOffset) * panY; // Pan the remaining distance
-    const drawY = -topCropOffset - panOffset;
+
+    // We start at 0 (Top of image is visible at top of screen).
+    // As panY goes from 0 to 1, we move the image UP (negative Y)
+    // to reveal the bottom parts.
+    const drawY = -(extraHeight * panY);
 
     ctx.drawImage(
       img, 
@@ -351,39 +333,28 @@ export function RevealZoomMobile({
   }, [windowZoomScale]);
 
   const scheduleCanvasDraw = useCallback(() => {
-    // Cancel any pending frame to ensure we use latest state
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-    }
-    rafIdRef.current = requestAnimationFrame(() => {
-      drawCanvas(true);
-    });
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    rafIdRef.current = requestAnimationFrame(() => drawCanvas(true));
   }, [drawCanvas]);
 
   const setupCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
     const rect = canvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
-    
     canvas.width = rect.width;
     canvas.height = rect.height;
-    
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'medium';
       canvasCtxRef.current = ctx;
     }
-    // Force draw on setup
     drawCanvas(true);
   }, [drawCanvas]);
 
-  // Force initial canvas draw when images are loaded
   useEffect(() => {
     if (allImagesLoaded && imageRef.current && canvasRef.current) {
-      // Small delay to ensure canvas is properly sized
       const timer = setTimeout(() => {
         setupCanvas();
         drawCanvas(true);
@@ -392,20 +363,13 @@ export function RevealZoomMobile({
     }
   }, [allImagesLoaded, setupCanvas, drawCanvas]);
 
-  // Handle Resize
   useEffect(() => {
     if (!allImagesLoaded) return;
-    
     const handleResize = () => {
       setupCanvas();
-      if (timelineRef.current) {
-        timelineRef.current.invalidate();
-      }
-      if (scrollTriggerRef.current) {
-        scrollTriggerRef.current.refresh();
-      }
+      timelineRef.current?.invalidate();
+      scrollTriggerRef.current?.refresh();
     };
-    
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [allImagesLoaded, setupCanvas]);
@@ -414,64 +378,35 @@ export function RevealZoomMobile({
   useEffect(() => {
     if (typeof window === 'undefined' || !allImagesLoaded || !isReady) return;
 
-    if (timelineRef.current) {
-      timelineRef.current.kill();
-      timelineRef.current = null;
-    }
-    if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.kill();
-      scrollTriggerRef.current = null;
-    }
+    if (timelineRef.current) timelineRef.current.kill();
+    if (scrollTriggerRef.current) scrollTriggerRef.current.kill();
 
-    animState.current = {
-      scale: 1,
-      panY: 0,
-      lastScale: -1,
-      lastPanY: -1,
-    };
+    animState.current = { scale: 1, panY: 0, lastScale: -1, lastPanY: -1 };
 
     gsap.set(shapeRef.current, { opacity: 1, force3D: true });
     gsap.set(buildingRef.current, { scale: 1, opacity: 1, force3D: true, z: 0 }); 
     gsap.set(textRef.current, { opacity: 0, y: 40 });
-    
     gsap.set([
-      pointer1InnerRef.current, 
-      pointer2InnerRef.current, 
-      pointer3InnerRef.current, 
-      pointer4InnerRef.current
+      pointer1InnerRef.current, pointer2InnerRef.current, 
+      pointer3InnerRef.current, pointer4InnerRef.current
     ], { opacity: 0, scale: 0.8, force3D: true });
 
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
     timelineRef.current = tl;
 
-    // PHASE 1: BUILDING ZOOM (0 - 2.5)
+    // ZOOM PHASE
     tl.to(shapeRef.current, { opacity: 0, duration: 0.6, ease: "power1.out" }, 0);
     tl.to(textRef.current, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.3);
-    
-    tl.to(buildingRef.current, { 
-      scale: buildingZoomScale, 
-      duration: 2.5,
-      ease: "sine.inOut",
-      force3D: true
-    }, 0);
+    tl.to(buildingRef.current, { scale: buildingZoomScale, duration: 2.5, ease: "sine.inOut", force3D: true }, 0);
 
-    // PHASE 2: TRANSITION - building and text fade out (2.2 - 2.8)
-    tl.to(buildingRef.current, { 
-      opacity: 0, 
-      duration: 0.6, 
-      ease: "power1.inOut"
-    }, 2.2);
-    tl.to(textRef.current, { 
-      opacity: 0, 
-      duration: 0.6, 
-      ease: "power1.inOut"
-    }, 2.2);
+    // FADE OUT PHASE
+    tl.to(buildingRef.current, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 2.2);
+    tl.to(textRef.current, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 2.2);
 
-    // PHASE 3: HOTSPOT REVEALS (2.8 - 8.0)
-    // Show hotspots one by one without zooming the window
+    // HOTSPOT REVEAL
     const revealHotspot = (ref: React.RefObject<HTMLDivElement | null>, time: number, duration: number = 2.0) => {
       tl.to(ref.current, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" }, time);
-      tl.to(ref.current, { opacity: 1, scale: 1, duration: duration }, time + 0.5); // Keep visible
+      tl.to(ref.current, { opacity: 1, scale: 1, duration: duration }, time + 0.5);
     };
 
     revealHotspot(pointer1InnerRef, 2.8, 1.5);
@@ -479,20 +414,17 @@ export function RevealZoomMobile({
     revealHotspot(pointer3InnerRef, 4.5, 1.5);
     revealHotspot(pointer4InnerRef, 5.5, 1.5);
 
-    // ScrollTrigger - optimized for smooth bidirectional touch scrolling
     const stTimer = setTimeout(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: wrapperRef.current,
         start: "top top",
         end: scrollDistance,
         pin: true,
-        scrub: 0.5, // Small value for responsive but smooth scrolling
+        scrub: 0.5,
         anticipatePin: 1,
         onUpdate: (self) => {
           if (timelineRef.current) {
-            // Direct progress update for smooth reverse scrolling
             timelineRef.current.progress(self.progress);
-            // Force canvas redraw on every update
             scheduleCanvasDraw();
           }
         }
@@ -501,23 +433,13 @@ export function RevealZoomMobile({
 
     return () => {
       clearTimeout(stTimer);
-      if (scrollTriggerRef.current) {
-        scrollTriggerRef.current.kill();
-        scrollTriggerRef.current = null;
-      }
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-        timelineRef.current = null;
-      }
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
+      scrollTriggerRef.current?.kill();
+      timelineRef.current?.kill();
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
   }, [allImagesLoaded, isReady, buildingZoomScale, windowZoomScale, windowMoveDistance, scrollDistance, scheduleCanvasDraw]);
 
-  if (!isReady) {
-    return <section className="w-full h-screen bg-black" />;
-  }
+  if (!isReady) return <section className="w-full h-screen bg-black" />;
 
   return (
     <section 
@@ -532,37 +454,22 @@ export function RevealZoomMobile({
     >
       <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
         
-        {/* Layer 1: Window/Canvas - BACKGROUND (visible through transparent building) */}
+        {/* Layer 1: Window/Canvas */}
         <canvas 
           ref={canvasRef} 
           className="absolute inset-0 w-full h-full" 
-          style={{ 
-            zIndex: 1,
-            backgroundColor: 'transparent',
-          }} 
+          style={{ zIndex: 1, backgroundColor: 'transparent' }} 
         />
 
-        {/* Layer 2: Building Image - FOREGROUND */}
-        {/* The building will show the window behind it */}
-        <div 
-          className="absolute inset-0 w-full h-full pointer-events-none" 
-          style={{ zIndex: 10 }}
-        >
+        {/* Layer 2: Building Image */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
           <img
             ref={buildingRef}
             src={resolvedBuildingSrc}
             alt="Building View"
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ 
-              willChange: 'transform, opacity', 
-              backfaceVisibility: 'hidden', 
-              transform: 'translateZ(0)',
-              // Window will show through. Options:
-              // 1. If your PNG has alpha transparency - remove opacity below
-              // 2. If your PNG is opaque - keep opacity for visibility
-              // opacity: 0.9, // Uncomment if PNG is fully opaque
-            }}
+            style={{ willChange: 'transform, opacity', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           />
         </div>
 
@@ -573,61 +480,35 @@ export function RevealZoomMobile({
           alt=""
           decoding="async"
           className="absolute top-0 left-1/2 w-full max-w-[100vw] -translate-x-1/2 pointer-events-none"
-          style={{ 
-            zIndex: 100, 
-            height: 'auto', 
-            objectFit: 'contain', 
-            willChange: 'opacity', 
-            backfaceVisibility: 'hidden' 
-          }}
+          style={{ zIndex: 100, height: 'auto', objectFit: 'contain', willChange: 'opacity', backfaceVisibility: 'hidden' }}
         />
 
-        {/* MOBILE HOTSPOTS */}
+        {/* HOTSPOTS */}
         <div ref={pointer1Ref} className="absolute" style={{ zIndex: 20, top: '25%', right: '20%', willChange: 'transform' }}>
           <div ref={pointer1InnerRef} className="opacity-0 scale-90 origin-center">
-            <MobileHotspot 
-              title="SkyPods" 
-              subtitle="54th-55th Floor" 
-              position="left" 
-              description="The 4 Sky Pods, inspired by the elements, elevate everyday moments into something truly spectacular." 
-            />
+            <MobileHotspot title="SkyPods" subtitle="54th-55th Floor" position="left" description="The 4 Sky Pods, inspired by the elements, elevate everyday moments into something truly spectacular." />
           </div>
         </div>
 
         <div ref={pointer2Ref} className="absolute" style={{ zIndex: 20, top: '35%', left: '15%', willChange: 'transform' }}>
           <div ref={pointer2InnerRef} className="opacity-0 scale-90 origin-center">
-            <MobileHotspot 
-              title="Residencies" 
-              subtitle="5th-53rd Floor" 
-              position="left" 
-              description="Live uninhibited at our magnificent residences that stretch out at 8,000+ sft each." 
-            />
+            <MobileHotspot title="Residencies" subtitle="5th-53rd Floor" position="left" description="Live uninhibited at our magnificent residences that stretch out at 8,000+ sft each." />
           </div>
         </div>
 
         <div ref={pointer3Ref} className="absolute" style={{ zIndex: 20, top: '180%', right: '25%', willChange: 'transform' }}>
           <div ref={pointer3InnerRef} className="opacity-0 scale-90 origin-center">
-            <MobileHotspot 
-              title="Clubhouse" 
-              subtitle="G-4th Floor" 
-              position="right" 
-              description="The first 4 floors of Mirai are a spectacular Clubhouse, accessible only to a privileged few." 
-            />
+            <MobileHotspot title="Clubhouse" subtitle="G-4th Floor" position="right" description="The first 4 floors of Mirai are a spectacular Clubhouse, accessible only to a privileged few." />
           </div>
         </div>
 
         <div ref={pointer4Ref} className="absolute" style={{ zIndex: 20, top: '195%', left: '10%', willChange: 'transform' }}>
           <div ref={pointer4InnerRef} className="opacity-0 scale-90 origin-center">
-            <MobileHotspot 
-              title="Podium Level" 
-              subtitle="Ground Floor" 
-              position="left" 
-              description="Discover mesmerising terrains & unique amenities at the podium of Mirai."
-            />
+            <MobileHotspot title="Podium Level" subtitle="Ground Floor" position="left" description="Discover mesmerising terrains & unique amenities at the podium of Mirai."/>
           </div>
         </div>
 
-        {/* Floating Text - Mobile optimized */}
+        {/* Text */}
         <div ref={textRef} className="absolute top-6 right-4 left-4" style={{ zIndex: 15 }}>
           <h2 
             className="text-white leading-tight tracking-tight uppercase text-center"
